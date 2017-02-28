@@ -47,3 +47,38 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |no
 |no
 |===
+
+== Features
+New Project command::
+If you're working in an existing maven project, just type `spring-boot-new-project` if you're in shell.
+It should read Spring Boot: New Project if you're in a GUI environment:
++
+[source,java]
+----
+spring-boot-new-project
+----
++
+And that's it!
+
+Select the Version::
+To specify the Spring Boot version to be used, pass as parameter this attribute `--spring-boot-version `
++
+[source,java]
+----
+spring-boot-new-project --spring-boot-version 1.4.1.RELEASE
+----
+
+If you don't specify the version, than a list will be displayed where one of the item is the default value.
+
+
+Add Dependency::
+You can install Spring Boot dependencies by using the command `spring-boot-new-project` followed by the parameter `--dependencies`:
++
+[source,java]
+----
+[demo]$ spring-boot-new-project --dependencies
+
+TODO
+----
++
+You can choose any dependency you want to install.
