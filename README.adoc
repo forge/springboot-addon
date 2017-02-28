@@ -43,6 +43,10 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |no
 |no
 
+|parser-yaml
+|no
+|no
+
 |cdi
 |no
 |no
