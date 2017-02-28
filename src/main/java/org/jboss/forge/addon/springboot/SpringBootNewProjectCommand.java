@@ -142,7 +142,9 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
                 list.add(new SpringBootDependencyDTO(groupName, id, name, description));
 
                 // are we at apache camel, then inject other Camel modules that are not in the spring-boot-application yet
-/*                if ("camel".equals(id)) {
+                // TODO - Check with F8 how we will manage that
+                /*
+                if ("camel".equals(id)) {
                     SpringBootDependencyDTO dto = new SpringBootDependencyDTO(groupName, "camel-zipkin-starter", "Apache Camel Zipkin", "Distributed tracing with an existing Zipkin installation with Apache Camel.");
                     String version = SpringBootVersionHelper.getVersion("camel.version");
                     dto.setMavenCoord("org.apache.camel", "camel-zipkin", version);
@@ -152,10 +154,13 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
         }
 
         // and then add the fabric8 group
+        // TODO - Check with F8 how we will manage that
+        /*
         String version = SpringBootVersionHelper.getVersion("fabric8.spring.cloud.kubernetes.version");
         SpringBootDependencyDTO dto = new SpringBootDependencyDTO("Fabric8", "spring-cloud-kubernetes", "Spring Cloud Kubernetes", "Kubernetes integration with Spring Cloud");
         dto.setMavenCoord("io.fabric8", "spring-cloud-starter-kubernetes-all", version);
         list.add(dto);
+        */
 
         return list;
     }
