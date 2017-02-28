@@ -76,9 +76,23 @@ You can install Spring Boot dependencies by using the command `spring-boot-new-p
 +
 [source,java]
 ----
-[demo]$ spring-boot-new-project --dependencies
-
-TODO
+spring-boot-new-project --dependencies
+Display all 113 possibilities? (y or n)
+activiti                       cassandra                      cluster-redis                  feign                          jms-hornetq                    neo4j                          sleuth-stream                  websocket
+actuator                       circuit-breaker-pcf            cluster-zookeeper              flyway                         jooq                           postgresql                     solr                           zipkin-client
+actuator-docs                  cloud-bootstrap                config-client                  freemarker                     jpa                            ratpack                        spring-cloud-kubernetes        zipkin-server
+amqp                           cloud-bus-amqp                 config-client-pcf              gemfire                        ldap                           reactive-web                   sql-server                     zipkin-stream
+aop                            cloud-bus-kafka                config-server                  groovy-templates               linkedin                       redis                          stream-kafka                   zipkin-ui
+apache-camel                   cloud-connectors               configuration-processor        h2                             liquibase                      remote-shell                   stream-rabbit                  zookeeper-configuration
+apache-camel-zipkin            cloud-contract-stub-runner     consul-configuration           hateoas                        local-data-flow-server         rest-docs                      thymeleaf                      zookeeper-discovery
+apache-derby                   cloud-contract-verifier        consul-discovery               hsqldb                         lombok                         rest-repositories              turbine                        zuul
+atomikos-jta                   cloud-contract-wiremock        couchbase                      hystrix                        mail                           rest-repositories-hal-browser  turbine-stream
+aws-core                       cloud-foundry-discovery        data-flow-shell                hystrix-dashboard              mobile                         retry                          twitter
+aws-jdbc                       cloud-oauth2                   devtools                       integration                    mongodb                        ribbon                         vaadin
+aws-messaging                  cloud-security                 elasticsearch                  jdbc                           mustache                       security                       validation
+batch                          cloud-task                     eureka-discovery               jersey-jax-rs                  mybatis                        service-registry-pcf           velocity
+bitronix-jta                   cluster-etcd                   eureka-server                  jms-activemq                   mysql                          session                        web
+cache                          cluster-hazelcast              facebook                       jms-artemis                    narayana-jta                   sleuth                         web-services
 ----
 +
 You can choose any dependency you want to install.
