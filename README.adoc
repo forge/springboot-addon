@@ -3,7 +3,7 @@
 
 == Spring Boot Forge addon
 
-image:https://forge.ci.cloudbees.com/buildStatus/icon?job=spring-boot-addon["Build Status", link="https://forge.ci.cloudbees.com/job/spring-boot-swarm-addon"]
+image:https://forge.ci.cloudbees.com/buildStatus/icon?job=springboot-addon["Build Status", link="https://forge.ci.cloudbees.com/job/springboot-addon"]
 image:http://img.shields.io/:license-EPL-blue.svg["License", link="https://www.eclipse.org/legal/epl-v10.html"]
 image:https://maven-badges.herokuapp.com/maven-central/org.jboss.forge.addon/spring-boot/badge.svg["Maven Central", link="https://maven-badges.herokuapp.com/maven-central/org.jboss.forge.addon/spring-boot"]
 
