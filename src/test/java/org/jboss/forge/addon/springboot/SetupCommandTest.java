@@ -54,12 +54,37 @@ public class SetupCommandTest {
 		// Checks the command metadata
 		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
 		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller.getCommand();
+		UICommandMetadata metadata = controller.getMetadata();
+		assertEquals("Spring Boot: New Project", metadata.getName());
+		assertEquals("Spring Boot", metadata.getCategory().getName());
+	}
+
+	@Test
+	public void checkSpringBootVersion() throws Exception {
+		CommandController controller = uiTestHarness
+				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
+		controller.initialize();
+		// Checks the command metadata
+		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
+		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller
+				.getCommand();
 
 		if (System.getProperty("spring.boot.default.version") != null) {
 			assertEquals("1.5.1", springBootCommand.getSpringBootDefaultVersion());
-		} else {
+		}
+		else {
 			assertEquals("1.4.1", springBootCommand.getSpringBootDefaultVersion());
 		}
+	}
+
+	@Test
+	public void checkSpringBootVersions() throws Exception {
+		CommandController controller = uiTestHarness
+				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
+		controller.initialize();
+		// Checks the command metadata
+		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
+		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller.getCommand();
 
 		String[] versions = springBootCommand.getSpringBootVersions();
 		if (System.getProperty("spring.boot.versions") != null) {
@@ -67,10 +92,6 @@ public class SetupCommandTest {
 		} else {
 			assertEquals("1.4.1",versions[1]);
 		}
-
-		UICommandMetadata metadata = controller.getMetadata();
-		assertEquals("Spring Boot: New Project", metadata.getName());
-		assertEquals("Spring Boot", metadata.getCategory().getName());
 	}
 
 }
