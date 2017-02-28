@@ -68,7 +68,6 @@ public class SetupCommandTest {
 		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
 		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller
 				.getCommand();
-
 		if (System.getProperty("spring.boot.default.version") != null) {
 			assertEquals("1.5.1", springBootCommand.getSpringBootDefaultVersion());
 		}
@@ -85,7 +84,6 @@ public class SetupCommandTest {
 		// Checks the command metadata
 		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
 		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller.getCommand();
-
 		String[] versions = springBootCommand.getSpringBootVersions();
 		if (System.getProperty("spring.boot.versions") != null) {
 			assertEquals("1.4.3",versions[2]);
