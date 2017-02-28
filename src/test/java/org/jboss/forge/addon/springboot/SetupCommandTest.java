@@ -53,7 +53,7 @@ import static org.junit.Assert.assertTrue;
 			// Checks the command metadata
 			assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
 			UICommandMetadata metadata = controller.getMetadata();
-			assertEquals("WildFly Swarm: Setup", metadata.getName());
+			assertEquals("Spring Boot: Project", metadata.getName());
 			assertEquals("Spring Boot", metadata.getCategory().getName());
 		}
 	}
