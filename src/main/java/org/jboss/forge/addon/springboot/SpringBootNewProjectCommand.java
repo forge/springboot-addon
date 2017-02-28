@@ -65,8 +65,8 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
     // lets use a different category for this command
     private static final String CATEGORY = "Spring Boot";
 
-    private static String SPRING_BOOT_DEFAULT_VERSION;
-    private static final String[] SPRING_BOOT_VERSIONS = new String[]{"1.3.8", "1.4.1"};
+    public static String SPRING_BOOT_DEFAULT_VERSION;
+    private static String[] SPRING_BOOT_VERSIONS;
 
     private static final String STARTER_URL = "https://start.spring.io/starter.zip";
 
@@ -75,8 +75,9 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
     private static final String[] fabric8Deps = new String[]{"spring-cloud-kubernetes", "kubeflix-ribbon-discovery",
             "kubeflix-turbine-discovery", "kubeflix-turbine-server", "camel-zipkin-starter"};
 
-    {
-        SPRING_BOOT_DEFAULT_VERSION = System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null ? System.getenv("SPRING_BOOT_DEFAULT_VERSION") : "1.4.1" ;
+    public SpringBootNewProjectCommand() {
+        SPRING_BOOT_DEFAULT_VERSION = System.getProperty("spring.boot.default.version") != null ? System.getProperty("spring.boot.default.version") : "1.4.1" ;
+        SPRING_BOOT_VERSIONS = System.getProperty("spring.boot.versions") != null ? splitVersions(System.getProperty("spring.boot.versions")) : new String[]{"1.3.8","1.4.1"};
     }
 
     @Inject
@@ -91,6 +92,18 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
     @Inject
     private DependencyInstaller dependencyInstaller;
+
+    public static String[] splitVersions(String s) {
+        return s.split(",");
+    }
+
+    public String getSpringBootDefaultVersion() {
+        return SPRING_BOOT_DEFAULT_VERSION;
+    }
+
+    public String[] getSpringBootVersions() {
+        return SPRING_BOOT_VERSIONS;
+    }
 
     @Override
     public void initializeUI(UIBuilder builder) throws Exception {

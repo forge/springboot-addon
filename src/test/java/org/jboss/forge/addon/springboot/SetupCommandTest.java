@@ -28,6 +28,7 @@ public class SetupCommandTest {
 	private ShellTest shellTest;
 
 	private Project project;
+	private String springBootVersion;
 
 	@Before
 	public void setUp() throws Exception {
@@ -52,6 +53,21 @@ public class SetupCommandTest {
 		controller.initialize();
 		// Checks the command metadata
 		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
+		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller.getCommand();
+
+		if (System.getProperty("spring.boot.default.version") != null) {
+			assertEquals("1.5.1", springBootCommand.getSpringBootDefaultVersion());
+		} else {
+			assertEquals("1.4.1", springBootCommand.getSpringBootDefaultVersion());
+		}
+
+		String[] versions = springBootCommand.getSpringBootVersions();
+		if (System.getProperty("spring.boot.versions") != null) {
+			assertEquals("1.4.3",versions[2]);
+		} else {
+			assertEquals("1.4.1",versions[1]);
+		}
+
 		UICommandMetadata metadata = controller.getMetadata();
 		assertEquals("Spring Boot: New Project", metadata.getName());
 		assertEquals("Spring Boot", metadata.getCategory().getName());
