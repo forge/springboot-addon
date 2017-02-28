@@ -23,7 +23,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author <a href="mailto:cmoullia@redhat.com">Charles Moulliard</a>
  */
-@RunWith(Arquillian.class) public class SetupCommandTest {
+@RunWith(Arquillian.class)
+public class SetupCommandTest {
 	private ProjectFactory projectFactory;
 	private UITestHarness uiTestHarness;
 	private ShellTest shellTest;
@@ -32,16 +33,16 @@ import static org.junit.Assert.assertTrue;
 
 	@Before
 	public void setUp() throws Exception {
-/*		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader())
+		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader())
 				.getAddonRegistry();
 		projectFactory = addonRegistry.getServices(ProjectFactory.class).get();
 		uiTestHarness = addonRegistry.getServices(UITestHarness.class).get();
 		shellTest = addonRegistry.getServices(ShellTest.class).get();
-		project = projectFactory.createTempProject();*/
-		projectFactory = SimpleContainer.getServices(getClass().getClassLoader(), ProjectFactory.class).get();
+		project = projectFactory.createTempProject();
+/*		projectFactory = SimpleContainer.getServices(getClass().getClassLoader(), ProjectFactory.class).get();
 		uiTestHarness = SimpleContainer.getServices(getClass().getClassLoader(), UITestHarness.class).get();
 		shellTest = SimpleContainer.getServices(getClass().getClassLoader(), ShellTest.class).get();
-		project = projectFactory.createTempProject();
+		project = projectFactory.createTempProject();*/
 	}
 
 	@After
