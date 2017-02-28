@@ -149,7 +149,7 @@
   </dependencies>
 
   <build>
-    <finalName>addon</finalName>
+    <finalName>spring-boot-addon</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
@@ -166,35 +166,46 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <inherited>true</inherited>
+        <configuration>
+          <preparationGoals>clean install</preparationGoals>
+          <releaseProfiles>gpg-sign,jboss-release</releaseProfiles>
+          <tagNameFormat>@{project.version}</tagNameFormat>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.3</version>
+        <extensions>true</extensions>
+        <configuration>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <serverId>ossrh</serverId>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>release</id>
-      <activation/>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jboss.forge.furnace</groupId>
-            <artifactId>furnace-maven-plugin</artifactId>
-            <version>${furnace.version}</version>
-            <executions>
-              <execution>
-                <id>generate-dot</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>generate-dot</goal>
-                </goals>
-                <configuration>
-                  <attach>true</attach>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  <scm>
+    <connection>scm:git:git://github.com/forge/springboot-addon.git</connection>
+    <developerConnection>scm:git:git@github.com:forge/springboot-addon.git</developerConnection>
+    <url>http://github.com/forge/springboot-addon</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
 </project>

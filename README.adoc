@@ -19,7 +19,7 @@ From Forge CLI:
 
 [source,shell]
 ----
-addon-install-from-git --url https://github.com/forge/spring-boot-addon.git
+addon-install-from-git --url https://github.com/forge/springboot-addon.git
 ----
 
 === Depends on
