@@ -47,8 +47,6 @@ public class SetupCommandTest {
 
 	@Test
 	public void checkCommandMetadata() throws Exception {
-		System.out.println("Is Gui : " + uiTestHarness.isGui());
-		System.out.println("Project root : " + project.getRoot());
 		CommandController controller = uiTestHarness
 				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
 		controller.initialize();
