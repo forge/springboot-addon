@@ -9,6 +9,7 @@ import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.furnace.Furnace;
 import org.jboss.forge.furnace.addons.AddonRegistry;
+import org.jboss.forge.furnace.container.simple.lifecycle.SimpleContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,15 +32,20 @@ import static org.junit.Assert.assertTrue;
 
 	@Before
 	public void setUp() throws Exception {
-		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader())
+/*		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader())
 				.getAddonRegistry();
 		projectFactory = addonRegistry.getServices(ProjectFactory.class).get();
 		uiTestHarness = addonRegistry.getServices(UITestHarness.class).get();
 		shellTest = addonRegistry.getServices(ShellTest.class).get();
+		project = projectFactory.createTempProject();*/
+		projectFactory = SimpleContainer.getServices(getClass().getClassLoader(), ProjectFactory.class).get();
+		uiTestHarness = SimpleContainer.getServices(getClass().getClassLoader(), UITestHarness.class).get();
+		shellTest = SimpleContainer.getServices(getClass().getClassLoader(), ShellTest.class).get();
 		project = projectFactory.createTempProject();
 	}
 
-	@After public void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (shellTest != null) {
 			shellTest.close();
 		}
