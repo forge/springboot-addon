@@ -56,33 +56,28 @@
     <!-- Forge -->
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
-      <artifactId>ui</artifactId>
-      <classifier>forge-addon</classifier>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.forge.addon</groupId>
       <artifactId>maven</artifactId>
       <classifier>forge-addon</classifier>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.forge.addon</groupId>
-      <artifactId>projects</artifactId>
-      <classifier>forge-addon</classifier>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.forge.furnace.container</groupId>
-      <artifactId>simple</artifactId>
-      <classifier>forge-addon</classifier>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>parser-java</artifactId>
       <classifier>forge-addon</classifier>
-      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge.addon</groupId>
+      <artifactId>ui</artifactId>
+      <classifier>forge-addon</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge.addon</groupId>
+      <artifactId>projects</artifactId>
+      <classifier>forge-addon</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge.furnace.container</groupId>
+      <artifactId>cdi</artifactId>
+      <classifier>forge-addon</classifier>
     </dependency>
 
     <dependency>
@@ -114,18 +109,6 @@
       <artifactId>snakeyaml</artifactId>
       <version>1.17</version>
     </dependency>
-
-    <!-- Maybe not longer required after refactoring -->
-    <!--
-      This dependency generates this error
-      org.jboss.forge.furnace.exception.ContainerException: Expected only one [org.jboss.forge.furnace.lifecycle.AddonLifecycleProvider] but found multiple. Remove all but one redundant container implementations: [[org.jboss.forge.furnace.container:simple,2.25.2.Final +STARTED -> org.jboss.forge.furnace.container.simple.lifecycle.SimpleAddonLifecycleProvider@1ea53075], [org.jboss.forge.furnace.container:cdi,2.25.2.Final +STARTED -> org.jboss.forge.furnace.container.cdi.lifecycle.WeldAddonLifecycleProvider@2751714c]]
-    <dependency>
-      <groupId>org.jboss.forge.furnace.container</groupId>
-      <artifactId>cdi</artifactId>
-      <classifier>forge-addon</classifier>
-      <scope>provided</scope>
-    </dependency>
-    -->
 
     <dependency>
       <groupId>javax.inject</groupId>

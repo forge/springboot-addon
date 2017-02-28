@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(Arquillian.class)
 public class SetupCommandTest {
+
 	private ProjectFactory projectFactory;
 	private UITestHarness uiTestHarness;
 	private ShellTest shellTest;
@@ -35,10 +36,6 @@ public class SetupCommandTest {
 		uiTestHarness = addonRegistry.getServices(UITestHarness.class).get();
 		shellTest = addonRegistry.getServices(ShellTest.class).get();
 		project = projectFactory.createTempProject();
-/*		projectFactory = SimpleContainer.getServices(getClass().getClassLoader(), ProjectFactory.class).get();
-		uiTestHarness = SimpleContainer.getServices(getClass().getClassLoader(), UITestHarness.class).get();
-		shellTest = SimpleContainer.getServices(getClass().getClassLoader(), ShellTest.class).get();
-		project = projectFactory.createTempProject();*/
 	}
 
 	@After
@@ -50,14 +47,16 @@ public class SetupCommandTest {
 
 	@Test
 	public void checkCommandMetadata() throws Exception {
-		try (CommandController controller = uiTestHarness.createCommandController(SpringBootNewProjectCommand.class, project.getRoot())) {
-			controller.initialize();
-			// Checks the command metadata
-			assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
-			UICommandMetadata metadata = controller.getMetadata();
-			assertEquals("Spring Boot: New Project", metadata.getName());
-			assertEquals("Spring Boot", metadata.getCategory().getName());
-		}
+		System.out.println("Is Gui : " + uiTestHarness.isGui());
+		System.out.println("Project root : " + project.getRoot());
+		CommandController controller = uiTestHarness
+				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
+		controller.initialize();
+		// Checks the command metadata
+		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
+		UICommandMetadata metadata = controller.getMetadata();
+		assertEquals("Spring Boot: New Project", metadata.getName());
+		assertEquals("Spring Boot", metadata.getCategory().getName());
 	}
 
 }

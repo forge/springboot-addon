@@ -15,18 +15,23 @@
  */
 package org.jboss.forge.addon.springboot;
 
+import javax.inject.Inject;
+
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
-import org.jboss.forge.furnace.container.simple.lifecycle.SimpleContainer;
 
 /**
  * An abstract base class for SpringBoot related commands
  */
 public abstract class AbstractSpringBootCommand extends AbstractProjectCommand {
+
+    @Inject
+    private ProjectFactory projectFactory;
+
     @Override
     public UICommandMetadata getMetadata(UIContext context)
     {
@@ -34,9 +39,8 @@ public abstract class AbstractSpringBootCommand extends AbstractProjectCommand {
     }
 
     @Override
-    protected ProjectFactory getProjectFactory()
-    {
-        return SimpleContainer.getServices(getClass().getClassLoader(), ProjectFactory.class).get();
+    protected ProjectFactory getProjectFactory() {
+        return projectFactory;
     }
 
     @Override
