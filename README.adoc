@@ -28,14 +28,22 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |Addon |Exported |Optional
 
 |ui
-|yes
+|no
 |no
 
 |projects
-|yes
+|no
 |no
 
 |maven
-|yes
+|no
+|no
+
+|parser-java
+|no
+|no
+
+|cdi
+|no
 |no
 |===
