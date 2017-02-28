@@ -1,7 +1,7 @@
 :idprefix: id_
 :source-highlighter: pygments
 
-== Spring Boot Forge addon for JBoss Forge
+== Spring Boot Forge addon
 
 image:https://forge.ci.cloudbees.com/buildStatus/icon?job=spring-boot-addon["Build Status", link="https://forge.ci.cloudbees.com/job/spring-boot-swarm-addon"]
 image:http://img.shields.io/:license-EPL-blue.svg["License", link="https://www.eclipse.org/legal/epl-v10.html"]
