@@ -1,0 +1,41 @@
+:idprefix: id_
+:source-highlighter: pygments
+
+== Spring Boot Forge addon for JBoss Forge
+
+image:https://forge.ci.cloudbees.com/buildStatus/icon?job=spring-boot-addon["Build Status", link="https://forge.ci.cloudbees.com/job/spring-boot-swarm-addon"]
+image:http://img.shields.io/:license-EPL-blue.svg["License", link="https://www.eclipse.org/legal/epl-v10.html"]
+image:https://maven-badges.herokuapp.com/maven-central/org.jboss.forge.addon/spring-boot/badge.svg["Maven Central", link="https://maven-badges.herokuapp.com/maven-central/org.jboss.forge.addon/spring-boot"]
+
+This addon provides *standalone* functionality, and *exports services* for use in other addons.
+
+++++
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ebcnOopZFWs" frameborder="0" allowfullscreen></iframe>
+++++
+
+=== Installation
+
+From Forge CLI:
+
+[source,shell]
+----
+addon-install-from-git --url https://github.com/forge/spring-boot-addon.git
+----
+
+=== Depends on
+[options="header"]
+|===
+|Addon |Exported |Optional
+
+|ui
+|yes
+|no
+
+|projects
+|yes
+|no
+
+|maven
+|yes
+|no
+|===
