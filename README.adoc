@@ -105,9 +105,12 @@ aws-messaging                  cloud-security                 elasticsearch     
 batch                          cloud-task                     eureka-discovery               jersey-jax-rs                  mybatis                        service-registry-pcf           velocity
 bitronix-jta                   cluster-etcd                   eureka-server                  jms-activemq                   mysql                          session                        web
 cache                          cluster-hazelcast              facebook                       jms-artemis                    narayana-jta                   sleuth                         web-services
-
-or by selecting them
-spring-boot-new-project --spring-boot-version 1.4.3 --dependencies actuator web
 ----
 +
 You can choose any dependency you want to install.
+
+If you know which dependencies you need, you can pass them as a list of items separated by a space. Here is an example where you will pass the dependency
+about `web` and `actuator`
+----
+spring-boot-new-project --spring-boot-version 1.4.3 --dependencies actuator web
+----
