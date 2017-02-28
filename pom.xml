@@ -79,6 +79,11 @@
       <artifactId>cdi</artifactId>
       <classifier>forge-addon</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.forge.addon</groupId>
+      <artifactId>parser-yaml</artifactId>
+      <classifier>forge-addon</classifier>
+    </dependency>
 
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
@@ -101,19 +106,6 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-
-    <!-- yaml parser to load spring-boot dependency choices -->
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>1.17</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <version>1</version>
     </dependency>
 
     <!-- Testing -->
