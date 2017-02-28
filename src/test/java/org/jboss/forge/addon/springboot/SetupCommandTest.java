@@ -9,15 +9,12 @@ import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.furnace.Furnace;
 import org.jboss.forge.furnace.addons.AddonRegistry;
-import org.jboss.forge.furnace.container.simple.lifecycle.SimpleContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -33,8 +30,7 @@ public class SetupCommandTest {
 
 	@Before
 	public void setUp() throws Exception {
-		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader())
-				.getAddonRegistry();
+		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader()).getAddonRegistry();
 		projectFactory = addonRegistry.getServices(ProjectFactory.class).get();
 		uiTestHarness = addonRegistry.getServices(UITestHarness.class).get();
 		shellTest = addonRegistry.getServices(ShellTest.class).get();
@@ -54,8 +50,7 @@ public class SetupCommandTest {
 
 	@Test
 	public void checkCommandMetadata() throws Exception {
-		try (CommandController controller = uiTestHarness
-				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot())) {
+		try (CommandController controller = uiTestHarness.createCommandController(SpringBootNewProjectCommand.class, project.getRoot())) {
 			controller.initialize();
 			// Checks the command metadata
 			assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);

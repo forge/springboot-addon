@@ -61,7 +61,7 @@ import static org.jboss.forge.addon.springboot.IOHelper.copyAndCloseInput;
 import static org.jboss.forge.addon.springboot.OkHttpClientHelper.createOkHttpClient;
 import static org.jboss.forge.addon.springboot.UnzipHelper.unzip;
 
-public class SpringBootNewProjectCommand extends AbstractSpringBootCommand implements UIWizard {
+public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
     private static final transient Logger LOG = LoggerFactory.getLogger(SpringBootNewProjectCommand.class);
 
@@ -90,11 +90,6 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand imple
 
     @Inject
     private DependencyInstaller dependencyInstaller;
-
-    @Override
-    public NavigationResult next(UINavigationContext context) throws Exception {
-        return null;
-    }
 
     @Override
     public void initializeUI(UIBuilder builder) throws Exception {
