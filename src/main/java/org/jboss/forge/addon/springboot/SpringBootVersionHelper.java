@@ -22,7 +22,7 @@ import java.io.InputStream;
 public class SpringBootVersionHelper {
 
     public static String getVersion(String name) {
-        try (InputStream is = SpringBootVersionHelper.class.getResourceAsStream("/META-INF/maven/io.fabric8.forge/devops/pom.xml")) {
+        try (InputStream is = SpringBootVersionHelper.class.getResourceAsStream("/META-INF/maven/org.jboss.forge.addon/spring-boot/pom.xml")) {
             String xml = IOHelper.loadText(is);
             String version = between(xml, "<" + name + ">", "</" + name + ">");
             return version;
