@@ -77,7 +77,7 @@ To specify the Spring Boot version to be used, pass as parameter this attribute 
 +
 [source,java]
 ----
-spring-boot-new-project --spring-boot-version 1.4.1.RELEASE
+spring-boot-new-project --spring-boot-version 1.4.1
 ----
 
 If you don't specify the version, than a list will be displayed where one of the item is the default value.

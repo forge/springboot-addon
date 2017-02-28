@@ -65,7 +65,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
     // lets use a different category for this command
     private static final String CATEGORY = "Spring Boot";
 
-    private static final String SPRING_BOOT_DEFAULT_VERSION = "1.4.1";
+    private static String SPRING_BOOT_DEFAULT_VERSION;
     private static final String[] SPRING_BOOT_VERSIONS = new String[]{"1.3.8", "1.4.1"};
 
     private static final String STARTER_URL = "https://start.spring.io/starter.zip";
@@ -74,6 +74,10 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
     // fabric8 only dependencies which we should not pass on to start.spring.io
     private static final String[] fabric8Deps = new String[]{"spring-cloud-kubernetes", "kubeflix-ribbon-discovery",
             "kubeflix-turbine-discovery", "kubeflix-turbine-server", "camel-zipkin-starter"};
+
+    {
+        SPRING_BOOT_DEFAULT_VERSION = System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null ? System.getenv("SPRING_BOOT_DEFAULT_VERSION") : "1.4.1" ;
+    }
 
     @Inject
     @WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
