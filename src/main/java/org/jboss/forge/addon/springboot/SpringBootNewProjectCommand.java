@@ -38,18 +38,15 @@ import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
-import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
-import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
-import org.jboss.forge.addon.ui.wizard.UIWizard;
 import org.jboss.forge.furnace.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +65,8 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
     // lets use a different category for this command
     private static final String CATEGORY = "Spring Boot";
 
-    // lets use 1.3.x which currently fabric8 works best with
-    private static final String SPRING_BOOT_DEFAULT_VERSION = "1.4.2";
-    private static final String[] SPRING_BOOT_VERSIONS = new String[]{"1.3.8", "1.4.2"};
+    private static final String SPRING_BOOT_DEFAULT_VERSION = "1.4.3";
+    private static final String[] SPRING_BOOT_VERSIONS = new String[]{"1.3.8", "1.4.3"};
 
     private static final String STARTER_URL = "https://start.spring.io/starter.zip";
 

@@ -55,7 +55,7 @@ public class SetupCommandTest {
 			// Checks the command metadata
 			assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
 			UICommandMetadata metadata = controller.getMetadata();
-			assertEquals("Spring Boot: Project", metadata.getName());
+			assertEquals("Spring Boot: New Project", metadata.getName());
 			assertEquals("Spring Boot", metadata.getCategory().getName());
 		}
 	}
