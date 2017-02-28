@@ -49,8 +49,20 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |===
 
 == Features
+Setup a Maven Project::
+First, create a maven project where the groupId is by example `org.demo`, the artifact which is also the name o fthe folder `spring-boot` and the version `1.0`
+using the Forge shell
++
+----
+forge
+...
+To quit the shell, type 'exit'.
+
+[Temp]$ project-new --named spring-boot --version 1.0 --top-level-package org.demo
+----
+
 New Project command::
-If you're working in an existing maven project, just type `spring-boot-new-project` if you're in shell.
+Next, just type `spring-boot-new-project` if you're in shell.
 It should read Spring Boot: New Project if you're in a GUI environment:
 +
 [source,java]
@@ -93,6 +105,9 @@ aws-messaging                  cloud-security                 elasticsearch     
 batch                          cloud-task                     eureka-discovery               jersey-jax-rs                  mybatis                        service-registry-pcf           velocity
 bitronix-jta                   cluster-etcd                   eureka-server                  jms-activemq                   mysql                          session                        web
 cache                          cluster-hazelcast              facebook                       jms-artemis                    narayana-jta                   sleuth                         web-services
+
+or by selecting them
+spring-boot-new-project --spring-boot-version 1.4.3 --dependencies actuator web
 ----
 +
 You can choose any dependency you want to install.
