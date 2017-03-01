@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
 import org.jboss.forge.addon.ui.controller.WizardCommandController;
 import org.jboss.forge.addon.ui.result.CompositeResult;
 import org.jboss.forge.addon.ui.result.Result;
@@ -45,17 +46,17 @@ public class WizardCommandControllerTest
    })
    public static AddonArchive getDeployment()
    {
-      return ShrinkWrap.create(AddonArchive.class).addBeansXML().addClasses(AggregateWizard.class, ExampleCommand.class, ExampleTwoCommand.class);
+      return ShrinkWrap.create(AddonArchive.class).addBeansXML().addClasses(
+              AbstractProjectCommand.class,AggregateWizard.class,
+              ExampleCommand.class,ExampleTwoCommand.class);
    }
 
    @Inject
    UITestHarness testHarness;
 
    @Test
-   public void testAggregateWizard() throws Exception
-   {
-      try (WizardCommandController controller = testHarness.createWizardController(AggregateWizard.class))
-      {
+   public void testAggregateWizard() throws Exception {
+      try (WizardCommandController controller = testHarness.createWizardController(AggregateWizard.class))  {
          controller.initialize();
          Assert.assertFalse(controller.canMoveToNextStep());
          controller.setValueFor("value", "Anything");

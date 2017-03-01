@@ -6,11 +6,15 @@
  */
 package org.jboss.forge.addon.aggregate;
 
+import java.io.File;
 import java.util.Arrays;
 
 import javax.inject.Inject;
 
-import org.jboss.forge.addon.ui.command.AbstractUICommand;
+import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFactory;
+import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
+import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
@@ -29,8 +33,20 @@ import org.jboss.forge.addon.ui.wizard.UIWizard;
  * 
  * @author <a href="ggastald@redhat.com">George Gastaldi</a>
  */
-public class AggregateWizard extends AbstractUICommand implements UIWizard
+public class AggregateWizard extends AbstractProjectCommand implements UIWizard
 {
+   @Override
+   protected boolean isProjectRequired()
+   {
+      return false;
+   }
+
+   @Override
+   protected ProjectFactory getProjectFactory()
+   {
+      return null;
+   }
+
    @Inject
    @WithAttributes(label = "Value", required = true)
    private UIInput<String> value;
@@ -44,6 +60,13 @@ public class AggregateWizard extends AbstractUICommand implements UIWizard
    @Override
    public Result execute(UIExecutionContext context) throws Exception
    {
+      UIContext uiContext = context.getUIContext();
+      Project project = (Project) uiContext.getAttributeMap().get(Project.class);
+      if (project == null) {
+         project = getSelectedProject(context.getUIContext());
+      }
+      File folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
+      System.out.println("Folder : " + folder.getName());
       return Results.success(value.getValue());
    }
 
