@@ -7,6 +7,7 @@
 package org.jboss.forge.addon.springboot;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -18,9 +19,12 @@ import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
+import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.context.UIValidationContext;
 import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
+import org.jboss.forge.addon.ui.output.UIOutput;
+import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
@@ -61,7 +65,15 @@ public class DevOpsCommand extends AbstractProjectCommand implements UICommand {
          project = getSelectedProject(context.getUIContext());
       }
       File folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
-      System.out.println("Folder : " + folder.getAbsolutePath());
+
+      UIOutput output = context.getUIContext().getProvider().getOutput();
+
+      output.info(output.out(),"Folder : " + folder.getAbsolutePath());
+
+      Map<Object, Object> attributeMap = context.getUIContext().getAttributeMap();
+      output.info(output.out(),"Spring Boot Version : " + attributeMap.get("springboot-version"));
+      output.info(output.out(),"Dependencies : " + attributeMap.get("dependencies"));
+
       return Results.success("Hello, " + firstName.getValue());
    }
 

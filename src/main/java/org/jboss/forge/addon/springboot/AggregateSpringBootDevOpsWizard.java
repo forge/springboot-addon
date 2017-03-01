@@ -40,16 +40,6 @@ import org.jboss.forge.addon.ui.wizard.UIWizard;
 public class AggregateSpringBootDevOpsWizard extends AbstractProjectCommand implements UIWizard {
 
 	@Inject
-	@WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application")
-	public UISelectMany<SpringBootDependencyDTO> dependencies;
-
-	public List<SpringBootDependencyDTO> choices;
-
-	@Inject
-	@WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
-	public UISelectOne<String> springBootVersion;
-
-	@Inject
 	private ProjectFactory projectFactory;
 
 	@Override
@@ -68,31 +58,7 @@ public class AggregateSpringBootDevOpsWizard extends AbstractProjectCommand impl
 
 	@Override
 	public void initializeUI(UIBuilder builder) throws Exception {
-
-		springBootVersion.setValueChoices(Arrays.asList("1.4.1"));
-		springBootVersion.setDefaultValue("1.4.1");
-
-		choices = initDependencies();
-
-		dependencies.setValueChoices(choices);
-		if (builder.getUIContext().getProvider().isGUI()) {
-			dependencies.setItemLabelConverter(SpringBootDependencyDTO::getGroupAndName);
-		} else {
-			// if in CLI mode then use shorter names so they are tab friendly in the shell
-			dependencies.setItemLabelConverter(dto -> Commands.shellifyCommandName(dto.getName()));
-		}
-
-		dependencies.setValueConverter(s -> {
-			for (SpringBootDependencyDTO dto : choices) {
-				if (dto.getId().equals(s)) {
-					return dto;
-				}
-			}
-			return null;
-		});
-
-		builder.add(springBootVersion).add(dependencies);
-
+		builder.add(value);
 	}
 
 	@Override
@@ -106,27 +72,12 @@ public class AggregateSpringBootDevOpsWizard extends AbstractProjectCommand impl
 				  .name("aggregate-wizard");
 	}
 
-	@Override public NavigationResult next(UINavigationContext context) throws Exception {
-
-		Map<Object, Object> attributeMap = context.getUIContext().getAttributeMap();
-		attributeMap.put("springboot-version", springBootVersion.getValue());
-		attributeMap.put("dependencies", dependencies.getValue());
-
+	@Override
+	public NavigationResult next(UINavigationContext context) throws Exception {
 		NavigationResultBuilder builder = NavigationResultBuilder.create();
 		builder.add(getMetadata(context.getUIContext()),
 				Arrays.asList(DevOpsCommand.class, SpringBootCommand.class));
 		return builder.build();
-	}
-
-	private List<SpringBootDependencyDTO> initDependencies() {
-		List<SpringBootDependencyDTO> list = new ArrayList<>();
-		SpringBootDependencyDTO dto = new SpringBootDependencyDTO("toto",
-				"camel-zipkin-starter", "Apache Camel Zipkin",
-				"Distributed tracing with an existing Zipkin installation with Apache Camel.");
-		String version = SpringBootVersionHelper.getVersion("camel.version");
-		dto.setMavenCoord("org.apache.camel", "camel-zipkin", version);
-		list.add(dto);
-		return list;
 	}
 
 }
