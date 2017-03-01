@@ -74,7 +74,6 @@ public class DevOpsCommand extends AbstractProjectCommand implements UICommand {
 
       Map<Object, Object> attributeMap = context.getUIContext().getAttributeMap();
       output.info(output.out(),"Spring Boot Version : " + (UISelectOne<String>)attributeMap.get("springboot-version"));
-      output.info(output.out(),"Dependencies : " + (UISelectMany<UISelectOne<String>>)attributeMap.get("dependencies"));
 
       return Results.success("Hello, " + firstName.getValue());
    }
