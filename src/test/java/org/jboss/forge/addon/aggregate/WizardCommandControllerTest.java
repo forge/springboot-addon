@@ -39,21 +39,13 @@ public class WizardCommandControllerTest
 {
 
    @Deployment
-   @AddonDeployments({
-           @AddonDeployment(name = "org.jboss.forge.addon:ui-test-harness"),
-           @AddonDeployment(name = "org.jboss.forge.furnace.container:cdi")
+   @AddonDependencies({
+           @AddonDependency(name = "org.jboss.forge.addon:ui-test-harness"),
+           @AddonDependency(name = "org.jboss.forge.furnace.container:cdi")
    })
    public static AddonArchive getDeployment()
    {
-      AddonArchive archive = ShrinkWrap
-              .create(AddonArchive.class)
-              .addBeansXML()
-              .addClasses(AggregateWizard.class, ExampleCommand.class, ExampleTwoCommand.class)
-              .addAsAddonDependencies(
-                      AddonDependencyEntry.create("org.jboss.forge.addon:ui-test-harness"),
-                      AddonDependencyEntry.create("org.jboss.forge.furnace.container:cdi"));
-
-      return archive;
+      return ShrinkWrap.create(AddonArchive.class).addBeansXML().addClasses(AggregateWizard.class, ExampleCommand.class, ExampleTwoCommand.class);
    }
 
    @Inject
