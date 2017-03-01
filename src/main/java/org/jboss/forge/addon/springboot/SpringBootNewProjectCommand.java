@@ -216,6 +216,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
         CollectionStringBuffer csbFabric8 = new CollectionStringBuffer(",");
         for (int val : selected) {
             SpringBootDependencyDTO dto = choices.get(val);
+            // TODO - Check with F8 how we will manage that
             if (isFabric8Dependency(dto.getId())) {
                 csbFabric8.append(dto.getId());
             } else {
@@ -279,6 +280,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
         return Results.success("Created new Spring Boot project in directory: " + folder.getName());
     }
 
+    // TODO - Check with F8 how we will manage that
     private void addFabric8DependenciesToPom(Project project, String fabric8Deps, Map<String, SpringBootDependencyDTO> selectedDTOs) {
         String[] deps = fabric8Deps.split(",");
         for (String dep : deps) {
@@ -290,6 +292,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
         }
     }
 
+    // TODO - Check with F8 how we will manage that
     private boolean isFabric8Dependency(String depId) {
         for (String id : fabric8Deps) {
             if (depId.equals(id)) {

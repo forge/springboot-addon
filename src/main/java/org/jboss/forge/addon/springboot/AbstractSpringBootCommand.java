@@ -33,20 +33,8 @@ public abstract class AbstractSpringBootCommand extends AbstractProjectCommand {
     private ProjectFactory projectFactory;
 
     @Override
-    public UICommandMetadata getMetadata(UIContext context)
-    {
-        return Metadata.forCommand(getClass()).category(Categories.create("Spring-Boot"));
-    }
-
-    @Override
     protected ProjectFactory getProjectFactory() {
         return projectFactory;
-    }
-
-    @Override
-    protected boolean isProjectRequired()
-    {
-        return true;
     }
 
 }
