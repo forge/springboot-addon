@@ -22,6 +22,7 @@ import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.context.UIValidationContext;
 import org.jboss.forge.addon.ui.input.UIInput;
+import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.output.UIOutput;
@@ -73,7 +74,7 @@ public class DevOpsCommand extends AbstractProjectCommand implements UICommand {
 
       Map<Object, Object> attributeMap = context.getUIContext().getAttributeMap();
       output.info(output.out(),"Spring Boot Version : " + (UISelectOne<String>)attributeMap.get("springboot-version"));
-      output.info(output.out(),"Dependencies : " + attributeMap.get("dependencies"));
+      output.info(output.out(),"Dependencies : " + (UISelectMany<UISelectOne<String>>)attributeMap.get("dependencies"));
 
       return Results.success("Hello, " + firstName.getValue());
    }

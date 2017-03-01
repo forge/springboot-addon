@@ -91,8 +91,8 @@ public class SpringBootCommand extends AbstractProjectCommand implements UIComma
          return null;
       });
 
-      builder.getUIContext().getAttributeMap().put("springboot-version",springBootVersion);
-      builder.getUIContext().getAttributeMap().put("dependencies",dependencies);
+      builder.getUIContext().getAttributeMap().put("springboot-version",springBootVersion.getValue());
+      builder.getUIContext().getAttributeMap().put("dependencies",dependencies.getValue());
 
       builder.add(lastName).add(springBootVersion).add(dependencies);
    }
