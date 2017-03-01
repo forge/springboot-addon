@@ -4,7 +4,7 @@
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.forge.addon.aggregate;
+package org.jboss.forge.addon.springboot;
 
 import java.util.List;
 
@@ -12,7 +12,12 @@ import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
+import org.jboss.forge.addon.springboot.AggregateSpringBootDevOpsWizard;
+import org.jboss.forge.addon.springboot.DevOpsCommand;
+import org.jboss.forge.addon.springboot.SpringBootCommand;
 import org.jboss.forge.addon.ui.controller.WizardCommandController;
 import org.jboss.forge.addon.ui.result.CompositeResult;
 import org.jboss.forge.addon.ui.result.Result;
@@ -33,31 +38,36 @@ import static org.hamcrest.CoreMatchers.not;
  * @author <a href="ggastald@redhat.com">George Gastaldi</a>
  */
 @RunWith(Arquillian.class)
-public class WizardCommandControllerTest
-{
+public class AggregateSpringBootDevOpsTest {
 
    @Deployment
    @AddonDependencies({
            @AddonDependency(name = "org.jboss.forge.addon:ui-test-harness"),
+           @AddonDependency(name = "org.jboss.forge.addon:spring-boot"),
            @AddonDependency(name = "org.jboss.forge.addon:projects"),
+           @AddonDependency(name = "org.jboss.forge.addon:maven"),
            @AddonDependency(name = "org.jboss.forge.furnace.container:cdi")
    })
-   public static AddonArchive getDeployment()
-   {
+   public static AddonArchive getDeployment() {
       return ShrinkWrap.create(AddonArchive.class).addBeansXML().addClasses(
-              AbstractProjectCommand.class,AggregateWizard.class,
-              ExampleCommand.class,ExampleTwoCommand.class);
+              AbstractProjectCommand.class,AggregateSpringBootDevOpsWizard.class,
+              DevOpsCommand.class,SpringBootCommand.class);
    }
+
+   @Inject
+   ProjectFactory projectFactory;
 
    @Inject
    UITestHarness testHarness;
 
    @Test
    public void testAggregateWizard() throws Exception {
-      try (WizardCommandController controller = testHarness.createWizardController(AggregateWizard.class))  {
+      Project project = projectFactory.createTempProject();
+      try (
+         WizardCommandController controller = testHarness.createWizardController(AggregateSpringBootDevOpsWizard.class,project.getRoot()))  {
          controller.initialize();
          Assert.assertFalse(controller.canMoveToNextStep());
-         controller.setValueFor("value", "Anything");
+         controller.setValueFor("springboot", "1.4.1");
          Assert.assertTrue(controller.canMoveToNextStep());
          controller.next().initialize();
          controller.setValueFor("firstName", "George");
