@@ -48,7 +48,7 @@ public class WizardCommandControllerTest
       AddonArchive archive = ShrinkWrap
               .create(AddonArchive.class)
               .addBeansXML()
-              .addClass(AggregateWizard.class)
+              .addClasses(AggregateWizard.class, ExampleCommand.class, ExampleTwoCommand.class)
               .addAsAddonDependencies(
                       AddonDependencyEntry.create("org.jboss.forge.addon:ui-test-harness"),
                       AddonDependencyEntry.create("org.jboss.forge.furnace.container:cdi"));
