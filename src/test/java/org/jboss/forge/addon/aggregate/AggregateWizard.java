@@ -35,6 +35,10 @@ import org.jboss.forge.addon.ui.wizard.UIWizard;
  */
 public class AggregateWizard extends AbstractProjectCommand implements UIWizard
 {
+
+   @Inject
+   private ProjectFactory projectFactory;
+
    @Override
    protected boolean isProjectRequired()
    {
@@ -44,7 +48,7 @@ public class AggregateWizard extends AbstractProjectCommand implements UIWizard
    @Override
    protected ProjectFactory getProjectFactory()
    {
-      return null;
+      return projectFactory;
    }
 
    @Inject

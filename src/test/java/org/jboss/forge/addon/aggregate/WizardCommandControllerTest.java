@@ -42,6 +42,7 @@ public class WizardCommandControllerTest
    @Deployment
    @AddonDependencies({
            @AddonDependency(name = "org.jboss.forge.addon:ui-test-harness"),
+           @AddonDependency(name = "org.jboss.forge.addon:projects"),
            @AddonDependency(name = "org.jboss.forge.furnace.container:cdi")
    })
    public static AddonArchive getDeployment()
