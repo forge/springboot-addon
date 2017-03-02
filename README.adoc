@@ -129,4 +129,5 @@ export SPRING_BOOT_CONFIG_FILE=file:///path/to/your/spring-boot-application.yaml
 spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
 ----
 +
-An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]
+An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]. Only the dependencies section will be used to
+populate the pom.xml.
