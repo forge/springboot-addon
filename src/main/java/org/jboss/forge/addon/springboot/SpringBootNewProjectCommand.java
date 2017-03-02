@@ -34,8 +34,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.maven.model.Model;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.dependencies.DependencyInstaller;
+import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
@@ -118,7 +120,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
    private UISelectMany<SpringBootDependencyDTO> dependencies;
 
    @Inject
-   private DependencyInstaller dependencyInstaller;
+   ProjectFactory projectFactory;
 
    private List<SpringBootDependencyDTO> choices;
 
@@ -232,6 +234,21 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
    public Result execute(UIExecutionContext context) throws Exception
    {
       UIContext uiContext = context.getUIContext();
+
+      /*
+      SpringBootProjectType springBootProjectType = new SpringBootProjectType();
+      Project project = projectFactory.createTempProject(springBootProjectType.getRequiredFacets());
+      MavenFacet mavenFacet = project.getFacet(MavenFacet.class);
+      Model model = mavenFacet.getModel();
+      model.setArtifactId(named.getValue());
+      model.setGroupId(groupid.getValue());
+      model.setVersion(version.getValue());
+
+      String projectName = model.getArtifactId();
+      String projectGroupId = model.getGroupId();
+      String projectVersion = model.getVersion();
+      File folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
+      */
 
       Project project = (Project) uiContext.getAttributeMap().get(Project.class);
       if (project == null)
