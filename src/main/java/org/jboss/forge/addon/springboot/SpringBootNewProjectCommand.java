@@ -233,9 +233,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
 		// use http client to call start.spring.io that creates the project
 		OkHttpClient client = createOkHttpClient();
-
 		Request request = new Request.Builder().url(url).build();
-
 		Response response = client.newCall(request).execute();
 		InputStream is = response.body().byteStream();
 
@@ -276,7 +274,6 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 	}
 
 	private List fetchDependencies() throws Exception {
-
 		List<Map> deps;
 
 		// Check if we have a Spring Boot Config File
