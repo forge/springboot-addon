@@ -27,7 +27,7 @@
   </parent>
   <groupId>org.jboss.forge.addon</groupId>
   <artifactId>spring-boot</artifactId>
-  <version>1.0.0-SNASPHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>JBoss :: Forge Addon :: SpringBoot</name>
 
   <properties>
