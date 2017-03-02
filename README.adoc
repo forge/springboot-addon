@@ -86,7 +86,6 @@ spring-boot-new-project --spring-boot-version 1.4.1
 
 If you don't specify the version, than a list will be displayed where one of the item is the default value.
 
-
 Add Dependency::
 You can install Spring Boot dependencies by using the command `spring-boot-new-project` followed by the parameter `--dependencies`:
 +
@@ -117,4 +116,15 @@ If you know which dependencies you need, you can pass them as a list of items se
 about `web` and `actuator`
 ----
 spring-boot-new-project --spring-boot-version 1.4.3 --dependencies actuator web
+----
+
+Use your Config File::
+If you want to use a YAML config file containing the dependencies to be used for your project, you can create such a file according to the convention definec by
+http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#metadata-format[Spring Initialzr] and pass the reference to this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
++
+[source,java]
+----
+export SPRING_BOOT_CONFIG_FILE=file:///path/to/your/spring-boot-application.yaml
+
+spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
 ----
