@@ -24,96 +24,121 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-public class IOHelper {
+public class IOHelper
+{
 
-    /**
-     * Loads the entire stream into memory as a String and returns it.
-     * <p/>
-     * <b>Notice:</b> This implementation appends a <tt>\n</tt> as line
-     * terminator at the of the text.
-     * <p/>
-     * Warning, don't use for crazy big streams :)
-     */
-    public static String loadText(InputStream in) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        InputStreamReader isr = new InputStreamReader(in);
-        try {
-            BufferedReader reader = new BufferedReader(isr);
-            while (true) {
-                String line = reader.readLine();
-                if (line != null) {
-                    builder.append(line);
-                    builder.append("\n");
-                } else {
-                    break;
-                }
+   /**
+    * Loads the entire stream into memory as a String and returns it.
+    * <p/>
+    * <b>Notice:</b> This implementation appends a <tt>\n</tt> as line
+    * terminator at the of the text.
+    * <p/>
+    * Warning, don't use for crazy big streams :)
+    */
+   public static String loadText(InputStream in) throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+      InputStreamReader isr = new InputStreamReader(in);
+      try
+      {
+         BufferedReader reader = new BufferedReader(isr);
+         while (true)
+         {
+            String line = reader.readLine();
+            if (line != null)
+            {
+               builder.append(line);
+               builder.append("\n");
             }
-            return builder.toString();
-        } finally {
-            close(isr);
-            close(in);
-        }
-    }
-
-    public static void copyAndCloseInput(InputStream input, OutputStream output) throws IOException {
-        copyAndCloseInput(input, output, 8192);
-    }
-
-    public static void copyAndCloseInput(InputStream input, OutputStream output, int bufferSize) throws IOException {
-        copy(input, output, bufferSize, false);
-        close(input);
-    }
-
-    public static int copy(final InputStream input, final OutputStream output, int bufferSize, boolean flushOnEachWrite) throws IOException {
-        if (input instanceof ByteArrayInputStream) {
-            // optimized for byte array as we only need the max size it can be
-            input.mark(0);
-            input.reset();
-            bufferSize = input.available();
-        } else {
-            int avail = input.available();
-            if (avail > bufferSize) {
-                bufferSize = avail;
+            else
+            {
+               break;
             }
-        }
+         }
+         return builder.toString();
+      }
+      finally
+      {
+         close(isr);
+         close(in);
+      }
+   }
 
-        if (bufferSize > 262144) {
-            // upper cap to avoid buffers too big
-            bufferSize = 262144;
-        }
+   public static void copyAndCloseInput(InputStream input, OutputStream output) throws IOException
+   {
+      copyAndCloseInput(input, output, 8192);
+   }
 
-        final byte[] buffer = new byte[bufferSize];
-        int n = input.read(buffer);
-        int total = 0;
-        while (-1 != n) {
-            output.write(buffer, 0, n);
-            if (flushOnEachWrite) {
-                output.flush();
-            }
-            total += n;
-            n = input.read(buffer);
-        }
-        if (!flushOnEachWrite) {
-            // flush at end, if we didn't do it during the writing
+   public static void copyAndCloseInput(InputStream input, OutputStream output, int bufferSize) throws IOException
+   {
+      copy(input, output, bufferSize, false);
+      close(input);
+   }
+
+   public static int copy(final InputStream input, final OutputStream output, int bufferSize, boolean flushOnEachWrite)
+            throws IOException
+   {
+      if (input instanceof ByteArrayInputStream)
+      {
+         // optimized for byte array as we only need the max size it can be
+         input.mark(0);
+         input.reset();
+         bufferSize = input.available();
+      }
+      else
+      {
+         int avail = input.available();
+         if (avail > bufferSize)
+         {
+            bufferSize = avail;
+         }
+      }
+
+      if (bufferSize > 262144)
+      {
+         // upper cap to avoid buffers too big
+         bufferSize = 262144;
+      }
+
+      final byte[] buffer = new byte[bufferSize];
+      int n = input.read(buffer);
+      int total = 0;
+      while (-1 != n)
+      {
+         output.write(buffer, 0, n);
+         if (flushOnEachWrite)
+         {
             output.flush();
-        }
-        return total;
-    }
+         }
+         total += n;
+         n = input.read(buffer);
+      }
+      if (!flushOnEachWrite)
+      {
+         // flush at end, if we didn't do it during the writing
+         output.flush();
+      }
+      return total;
+   }
 
-    /**
-     * Closes the given resource if it is available, logging any closing exceptions to the given log.
-     *
-     * @param closeable the object to close
-     */
-    public static void close(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-    }
-
+   /**
+    * Closes the given resource if it is available, logging any closing exceptions to the given log.
+    *
+    * @param closeable the object to close
+    */
+   public static void close(Closeable closeable)
+   {
+      if (closeable != null)
+      {
+         try
+         {
+            closeable.close();
+         }
+         catch (IOException e)
+         {
+            // ignore
+         }
+      }
+   }
 
 }

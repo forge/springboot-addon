@@ -33,39 +33,49 @@ import okhttp3.OkHttpClient;
  * To work around: https://github.com/square/okhttp/issues/2323
  * version 3.0.1 onwards fails (maybe 3.3.0 is fixed)
  */
-public class OkHttpClientHelper {
+public class OkHttpClientHelper
+{
 
-    public static OkHttpClient createOkHttpClient() {
-        X509TrustManager tm = provideX509TrustManager();
-        SSLSocketFactory ssf = provideSSLSocketFactory(tm);
+   public static OkHttpClient createOkHttpClient()
+   {
+      X509TrustManager tm = provideX509TrustManager();
+      SSLSocketFactory ssf = provideSSLSocketFactory(tm);
 
-        return new OkHttpClient.Builder()
-//                .sslSocketFactory(ssf)
-                .build();
-    }
+      return new OkHttpClient.Builder()
+               //                .sslSocketFactory(ssf)
+               .build();
+   }
 
-    private static X509TrustManager provideX509TrustManager() {
-        try {
-            TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            factory.init((KeyStore) null);
-            TrustManager[] trustManagers = factory.getTrustManagers();
-            return (X509TrustManager) trustManagers[0];
-        } catch (NoSuchAlgorithmException | KeyStoreException exception) {
-            // ignore
-        }
+   private static X509TrustManager provideX509TrustManager()
+   {
+      try
+      {
+         TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+         factory.init((KeyStore) null);
+         TrustManager[] trustManagers = factory.getTrustManagers();
+         return (X509TrustManager) trustManagers[0];
+      }
+      catch (NoSuchAlgorithmException | KeyStoreException exception)
+      {
+         // ignore
+      }
 
-        return null;
-    }
+      return null;
+   }
 
-    private static SSLSocketFactory provideSSLSocketFactory(X509TrustManager trustManager) {
-        try {
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{trustManager}, null);
-            return sslContext.getSocketFactory();
-        } catch (NoSuchAlgorithmException | KeyManagementException exception) {
-            // ignore
-        }
+   private static SSLSocketFactory provideSSLSocketFactory(X509TrustManager trustManager)
+   {
+      try
+      {
+         SSLContext sslContext = SSLContext.getInstance("TLS");
+         sslContext.init(null, new TrustManager[] { trustManager }, null);
+         return sslContext.getSocketFactory();
+      }
+      catch (NoSuchAlgorithmException | KeyManagementException exception)
+      {
+         // ignore
+      }
 
-        return (SSLSocketFactory) SSLSocketFactory.getDefault();
-    }
+      return (SSLSocketFactory) SSLSocketFactory.getDefault();
+   }
 }

@@ -1,17 +1,17 @@
 /**
- *  Copyright 2005-2015 Red Hat, Inc.
+ * Copyright 2005-2015 Red Hat, Inc.
  *
- *  Red Hat licenses this file to you under the Apache License, version
- *  2.0 (the "License"); you may not use this file except in compliance
- *  with the License.  You may obtain a copy of the License at
+ * Red Hat licenses this file to you under the Apache License, version
+ * 2.0 (the "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied.  See the License for the specific language governing
- *  permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 package org.jboss.forge.addon.springboot;
 
@@ -19,22 +19,20 @@ import javax.inject.Inject;
 
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
-import org.jboss.forge.addon.ui.context.UIContext;
-import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
-import org.jboss.forge.addon.ui.util.Categories;
-import org.jboss.forge.addon.ui.util.Metadata;
 
 /**
  * An abstract base class for SpringBoot related commands
  */
-public abstract class AbstractSpringBootCommand extends AbstractProjectCommand {
+public abstract class AbstractSpringBootCommand extends AbstractProjectCommand
+{
 
-    @Inject
-    private ProjectFactory projectFactory;
+   @Inject
+   private ProjectFactory projectFactory;
 
-    @Override
-    protected ProjectFactory getProjectFactory() {
-        return projectFactory;
-    }
+   @Override
+   protected ProjectFactory getProjectFactory()
+   {
+      return projectFactory;
+   }
 
 }
