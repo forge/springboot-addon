@@ -17,15 +17,19 @@ package org.jboss.forge.addon.springboot;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -47,6 +51,9 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -65,34 +72,39 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 	// lets use a different category for this command
 	private static final String CATEGORY = "Spring Boot";
 
-	public static String SPRING_BOOT_DEFAULT_VERSION;
+	private static String SPRING_BOOT_DEFAULT_VERSION;
 	private static String[] SPRING_BOOT_VERSIONS;
+	private static String SPRING_BOOT_CONFIG_FILE;
 
-	private static final String STARTER_URL = "https://start.spring.io/starter.zip";
+	private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
+	private static final String STARTER_URL = "https://start.spring.io";
 
-	// TODO - Check with F8 how we will manage that
-	// fabric8 only dependencies which we should not pass on to start.spring.io
-	private static final String[] fabric8Deps = new String[] { "spring-cloud-kubernetes",
-			"kubeflix-ribbon-discovery", "kubeflix-turbine-discovery",
-			"kubeflix-turbine-server", "camel-zipkin-starter" };
+	private UIOutput uiOutput;
 
 	public SpringBootNewProjectCommand() {
 		SPRING_BOOT_DEFAULT_VERSION =
-				System.getProperty("spring.boot.default.version") != null ?
-						System.getProperty("spring.boot.default.version") :
+				System.getenv("spring.boot.default.version") != null ?
+						System.getenv("spring.boot.default.version") :
 						"1.4.1";
-		SPRING_BOOT_VERSIONS = System.getProperty("spring.boot.versions") != null ?
-				splitVersions(System.getProperty("spring.boot.versions")) :
+		SPRING_BOOT_VERSIONS = System.getenv("spring.boot.versions") != null ?
+				splitVersions(System.getenv("spring.boot.versions")) :
 				new String[] { "1.3.8", "1.4.1" };
+
+		SPRING_BOOT_CONFIG_FILE = System.getenv("spring.boot.config.file");
 	}
 
-	@Inject @WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use") private UISelectOne<String> springBootVersion;
+	@Inject
+	@WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
+	private UISelectOne<String> springBootVersion;
 
 	private List<SpringBootDependencyDTO> choices;
 
-	@Inject @WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application") private UISelectMany<SpringBootDependencyDTO> dependencies;
+	@Inject
+	@WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application")
+	private UISelectMany<SpringBootDependencyDTO> dependencies;
 
-	@Inject private DependencyInstaller dependencyInstaller;
+	@Inject
+	private DependencyInstaller dependencyInstaller;
 
 	public static String[] splitVersions(String s) {
 		return s.split(",");
@@ -106,7 +118,9 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 		return SPRING_BOOT_VERSIONS;
 	}
 
-	@Override public void initializeUI(UIBuilder builder) throws Exception {
+	@Override
+	public void initializeUI(UIBuilder builder) throws Exception {
+		uiOutput = builder.getUIContext().getProvider().getOutput();
 		springBootVersion.setValueChoices(Arrays.asList(SPRING_BOOT_VERSIONS));
 		springBootVersion.setDefaultValue(SPRING_BOOT_DEFAULT_VERSION);
 
@@ -142,22 +156,19 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 		builder.add(springBootVersion).add(dependencies);
 	}
 
-	private List<SpringBootDependencyDTO> initDependencies() {
+	private List<SpringBootDependencyDTO> initDependencies() throws Exception {
 		List<SpringBootDependencyDTO> list = new ArrayList<>();
 
-		Yaml yaml = new Yaml();
-		// load the application.yaml file from the spring-boot initializr project and parse it
-		// and grab all the dependencies it has so we have those as choices
-		InputStream input = SpringBootNewProjectCommand.class
-				.getResourceAsStream("/spring-boot-application.yaml");
-		Map data = (Map) yaml.load(input);
-
-		Map initializer = (Map) data.get("initializr");
-		List deps = (List) initializer.get("dependencies");
-		for (Object dep : deps) {
+		for (Object dep : fetchDependencies()) {
 			Map group = (Map) dep;
 			String groupName = (String) group.get("name");
-			List content = (List) group.get("content");
+			List content;
+			// Add this test as the json file & yaml file uses a different key
+			if (group.get("content") != null) {
+				content = (List) group.get("content");
+			} else {
+				content = (List) group.get("values");
+			}
 			for (Object row : content) {
 				Map item = (Map) row;
 				String id = (String) item.get("id");
@@ -170,19 +181,21 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 		return list;
 	}
 
-	@Override protected boolean isProjectRequired() {
+	@Override
+	protected boolean isProjectRequired() {
 		return false;
 	}
 
-	@Override public UICommandMetadata getMetadata(UIContext context) {
+	@Override
+	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.from(super.getMetadata(context), getClass())
 				.category(Categories.create(CATEGORY)).name(CATEGORY + ": New Project")
 				.description("Create a new Spring Boot project");
 	}
 
-	@Override public Result execute(UIExecutionContext context) throws Exception {
+	@Override
+	public Result execute(UIExecutionContext context) throws Exception {
 		UIContext uiContext = context.getUIContext();
-		UIOutput uiOutput = uiContext.getProvider().getOutput();
 
 		Project project = (Project) uiContext.getAttributeMap().get(Project.class);
 		if (project == null) {
@@ -212,7 +225,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
 		String url = String
 				.format("%s?bootVersion=%s&groupId=%s&artifactId=%s&version=%s&packageName=%s&dependencies=%s",
-						STARTER_URL, bootVersion, groupId, projectName, version, groupId,
+						STARTER_ZIP_URL, bootVersion, groupId, projectName, version, groupId,
 						springBootDeps);
 
 		LOG.info("About to query url: " + url);
@@ -260,6 +273,74 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 		// are there any fabric8 dependencies to add afterwards?
 		return Results.success(
 				"Created new Spring Boot project in directory: " + folder.getName());
+	}
+
+	private List fetchDependencies() throws Exception {
+
+		List<Map> deps;
+
+		// Check if we have a Spring Boot Config File
+		if (SPRING_BOOT_CONFIG_FILE != null) {
+			Yaml yaml = new Yaml();
+			InputStream input = new URL("SPRING_BOOT_CONFIG_FILE").openStream();
+			uiOutput.info(uiOutput.out(),"Will use the Spring Boot Config file : " + SPRING_BOOT_CONFIG_FILE);
+			Map data = (Map) yaml.load(input);
+			Map initializer = (Map) data.get("initializr");
+			deps = (List) initializer.get("dependencies");
+		} else {
+			// Fetch the dependencies list from the start.spring.io server
+			OkHttpClient client = createOkHttpClient();
+			Request request = new Request.Builder().url(STARTER_URL).build();
+			Response response = client.newCall(request).execute();
+			// uiOutput.info(uiOutput.out(),"Response received from starter web server : " + response.code());
+			Map data = jsonToMap(response.body().string());
+			Map dependencies = (Map) data.get("dependencies");
+			deps = (List) dependencies.get("values");
+			//uiOutput.error(uiOutput.err(),"Dependencies : " + deps);
+		}
+		return deps;
+	}
+
+	private Map<String,Object> jsonToMap(String content) throws IOException {
+		HashMap<String,Object> result = new ObjectMapper().readValue(content, HashMap.class);
+		JSONObject jObject = new JSONObject(result);
+		return toMap(jObject);
+	}
+
+	private Map<String, Object> toMap(JSONObject object) throws JSONException {
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		Iterator<String> keysItr = object.keys();
+		while(keysItr.hasNext()) {
+			String key = keysItr.next();
+			Object value = object.get(key);
+
+			if(value instanceof JSONArray) {
+				value = toList((JSONArray) value);
+			}
+
+			else if(value instanceof JSONObject) {
+				value = toMap((JSONObject) value);
+			}
+			map.put(key, value);
+		}
+		return map;
+	}
+
+	private List<Object> toList(JSONArray array) throws JSONException {
+		List<Object> list = new ArrayList<Object>();
+		for(int i = 0; i < array.length(); i++) {
+			Object value = array.get(i);
+			if(value instanceof JSONArray) {
+				value = toList((JSONArray) value);
+			}
+
+			else if(value instanceof JSONObject) {
+				value = toMap((JSONObject) value);
+			}
+			list.add(value);
+		}
+		return list;
 	}
 
 }

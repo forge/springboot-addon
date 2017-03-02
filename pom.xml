@@ -108,6 +108,13 @@
       <version>${jackson.version}</version>
     </dependency>
 
+    <!-- JSon to objects -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20160212</version>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.jboss.forge.furnace.test</groupId>
