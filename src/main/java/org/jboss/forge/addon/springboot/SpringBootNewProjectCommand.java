@@ -110,11 +110,11 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
    private UIInput<String> version;
 
    @Inject
-   @WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
+   @WithAttributes(label = "Spring Boot Version", description = "Spring Boot Version to use")
    private UISelectOne<String> springBootVersion;
 
    @Inject
-   @WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application")
+   @WithAttributes(label = "Dependencies", description = "Add Spring Boot Starters and dependencies to your application")
    private UISelectMany<SpringBootDependencyDTO> dependencies;
 
    @Inject
