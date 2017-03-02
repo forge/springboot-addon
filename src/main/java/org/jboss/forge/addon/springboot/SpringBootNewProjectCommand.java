@@ -86,8 +86,8 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 				System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null ?
 						System.getenv("SPRING_BOOT_DEFAULT_VERSION") :
 						"1.4.1";
-		SPRING_BOOT_VERSIONS = System.getenv("SPRING_BOOT_DEFAULT_VERSIONS") != null ?
-				splitVersions(System.getenv("SPRING_BOOT_DEFAULT_VERSIONS")) :
+		SPRING_BOOT_VERSIONS = System.getenv("SPRING_BOOT_VERSIONS") != null ?
+				splitVersions(System.getenv("SPRING_BOOT_VERSIONS")) :
 				new String[] { "1.3.8", "1.4.1" };
 
 		SPRING_BOOT_CONFIG_FILE = System.getenv("SPRING_BOOT_CONFIG_FILE");
@@ -97,14 +97,14 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 	@WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
 	private UISelectOne<String> springBootVersion;
 
-	private List<SpringBootDependencyDTO> choices;
-
 	@Inject
 	@WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application")
 	private UISelectMany<SpringBootDependencyDTO> dependencies;
 
 	@Inject
 	private DependencyInstaller dependencyInstaller;
+
+	private List<SpringBootDependencyDTO> choices;
 
 	public static String[] splitVersions(String s) {
 		return s.split(",");
