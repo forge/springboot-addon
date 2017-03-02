@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.dependencies.DependencyInstaller;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
@@ -48,7 +47,6 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
-import org.jboss.forge.furnace.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -61,251 +59,207 @@ import static org.jboss.forge.addon.springboot.UnzipHelper.unzip;
 
 public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
-    private static final transient Logger LOG = LoggerFactory.getLogger(SpringBootNewProjectCommand.class);
+	private static final transient Logger LOG = LoggerFactory
+			.getLogger(SpringBootNewProjectCommand.class);
 
-    // lets use a different category for this command
-    private static final String CATEGORY = "Spring Boot";
+	// lets use a different category for this command
+	private static final String CATEGORY = "Spring Boot";
 
-    public static String SPRING_BOOT_DEFAULT_VERSION;
-    private static String[] SPRING_BOOT_VERSIONS;
+	public static String SPRING_BOOT_DEFAULT_VERSION;
+	private static String[] SPRING_BOOT_VERSIONS;
 
-    private static final String STARTER_URL = "https://start.spring.io/starter.zip";
+	private static final String STARTER_URL = "https://start.spring.io/starter.zip";
 
-    // TODO - Check with F8 how we will manage that
-    // fabric8 only dependencies which we should not pass on to start.spring.io
-    private static final String[] fabric8Deps = new String[]{"spring-cloud-kubernetes", "kubeflix-ribbon-discovery",
-            "kubeflix-turbine-discovery", "kubeflix-turbine-server", "camel-zipkin-starter"};
+	// TODO - Check with F8 how we will manage that
+	// fabric8 only dependencies which we should not pass on to start.spring.io
+	private static final String[] fabric8Deps = new String[] { "spring-cloud-kubernetes",
+			"kubeflix-ribbon-discovery", "kubeflix-turbine-discovery",
+			"kubeflix-turbine-server", "camel-zipkin-starter" };
 
-    public SpringBootNewProjectCommand() {
-        SPRING_BOOT_DEFAULT_VERSION = System.getProperty("spring.boot.default.version") != null ? System.getProperty("spring.boot.default.version") : "1.4.1" ;
-        SPRING_BOOT_VERSIONS = System.getProperty("spring.boot.versions") != null ? splitVersions(System.getProperty("spring.boot.versions")) : new String[]{"1.3.8","1.4.1"};
-    }
+	public SpringBootNewProjectCommand() {
+		SPRING_BOOT_DEFAULT_VERSION =
+				System.getProperty("spring.boot.default.version") != null ?
+						System.getProperty("spring.boot.default.version") :
+						"1.4.1";
+		SPRING_BOOT_VERSIONS = System.getProperty("spring.boot.versions") != null ?
+				splitVersions(System.getProperty("spring.boot.versions")) :
+				new String[] { "1.3.8", "1.4.1" };
+	}
 
-    @Inject
-    @WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
-    private UISelectOne<String> springBootVersion;
+	@Inject @WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use") private UISelectOne<String> springBootVersion;
 
-    private List<SpringBootDependencyDTO> choices;
+	private List<SpringBootDependencyDTO> choices;
 
-    @Inject
-    @WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application")
-    private UISelectMany<SpringBootDependencyDTO> dependencies;
+	@Inject @WithAttributes(label = "Dependencies", required = true, description = "Add Spring Boot Starters and dependencies to your application") private UISelectMany<SpringBootDependencyDTO> dependencies;
 
-    @Inject
-    private DependencyInstaller dependencyInstaller;
+	@Inject private DependencyInstaller dependencyInstaller;
 
-    public static String[] splitVersions(String s) {
-        return s.split(",");
-    }
+	public static String[] splitVersions(String s) {
+		return s.split(",");
+	}
 
-    public String getSpringBootDefaultVersion() {
-        return SPRING_BOOT_DEFAULT_VERSION;
-    }
+	public String getSpringBootDefaultVersion() {
+		return SPRING_BOOT_DEFAULT_VERSION;
+	}
 
-    public String[] getSpringBootVersions() {
-        return SPRING_BOOT_VERSIONS;
-    }
+	public String[] getSpringBootVersions() {
+		return SPRING_BOOT_VERSIONS;
+	}
 
-    @Override
-    public void initializeUI(UIBuilder builder) throws Exception {
-        springBootVersion.setValueChoices(Arrays.asList(SPRING_BOOT_VERSIONS));
-        springBootVersion.setDefaultValue(SPRING_BOOT_DEFAULT_VERSION);
+	@Override public void initializeUI(UIBuilder builder) throws Exception {
+		springBootVersion.setValueChoices(Arrays.asList(SPRING_BOOT_VERSIONS));
+		springBootVersion.setDefaultValue(SPRING_BOOT_DEFAULT_VERSION);
 
-        try {
-            choices = initDependencies();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Error loading dependencies from spring-boot-application.yaml due: " + e.getMessage(), e);
-        }
+		try {
+			choices = initDependencies();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new IllegalStateException(
+					"Error loading dependencies from spring-boot-application.yaml due: "
+							+ e.getMessage(), e);
+		}
 
-        dependencies.setValueChoices(choices);
-        if (builder.getUIContext().getProvider().isGUI()) {
-            dependencies.setItemLabelConverter(SpringBootDependencyDTO::getGroupAndName);
-        } else {
-            // if in CLI mode then use shorter names so they are tab friendly in the shell
-            dependencies.setItemLabelConverter(dto -> Commands.shellifyCommandName(dto.getName()));
-        }
+		dependencies.setValueChoices(choices);
+		if (builder.getUIContext().getProvider().isGUI()) {
+			dependencies.setItemLabelConverter(SpringBootDependencyDTO::getGroupAndName);
+		}
+		else {
+			// if in CLI mode then use shorter names so they are tab friendly in the shell
+			dependencies.setItemLabelConverter(
+					dto -> Commands.shellifyCommandName(dto.getName()));
+		}
 
-        dependencies.setValueConverter(s -> {
-            for (SpringBootDependencyDTO dto : choices) {
-                if (dto.getId().equals(s)) {
-                    return dto;
-                }
-            }
-            return null;
-        });
+		dependencies.setValueConverter(s -> {
+			for (SpringBootDependencyDTO dto : choices) {
+				if (dto.getId().equals(s)) {
+					return dto;
+				}
+			}
+			return null;
+		});
 
-        builder.add(springBootVersion).add(dependencies);
-    }
+		builder.add(springBootVersion).add(dependencies);
+	}
 
-    private List<SpringBootDependencyDTO> initDependencies() {
-        List<SpringBootDependencyDTO> list = new ArrayList<>();
+	private List<SpringBootDependencyDTO> initDependencies() {
+		List<SpringBootDependencyDTO> list = new ArrayList<>();
 
-        Yaml yaml = new Yaml();
-        // load the application.yaml file from the spring-boot initializr project and parse it
-        // and grab all the dependencies it has so we have those as choices
-        InputStream input = SpringBootNewProjectCommand.class.getResourceAsStream("/spring-boot-application.yaml");
-        Map data = (Map) yaml.load(input);
+		Yaml yaml = new Yaml();
+		// load the application.yaml file from the spring-boot initializr project and parse it
+		// and grab all the dependencies it has so we have those as choices
+		InputStream input = SpringBootNewProjectCommand.class
+				.getResourceAsStream("/spring-boot-application.yaml");
+		Map data = (Map) yaml.load(input);
 
-        Map initializer = (Map) data.get("initializr");
-        List deps = (List) initializer.get("dependencies");
-        for (Object dep : deps) {
-            Map group = (Map) dep;
-            String groupName = (String) group.get("name");
-            List content = (List) group.get("content");
-            for (Object row : content) {
-                Map item = (Map) row;
-                String id = (String) item.get("id");
-                String name = (String) item.get("name");
-                String description = (String) item.get("description");
-                list.add(new SpringBootDependencyDTO(groupName, id, name, description));
+		Map initializer = (Map) data.get("initializr");
+		List deps = (List) initializer.get("dependencies");
+		for (Object dep : deps) {
+			Map group = (Map) dep;
+			String groupName = (String) group.get("name");
+			List content = (List) group.get("content");
+			for (Object row : content) {
+				Map item = (Map) row;
+				String id = (String) item.get("id");
+				String name = (String) item.get("name");
+				String description = (String) item.get("description");
+				list.add(new SpringBootDependencyDTO(groupName, id, name, description));
+			}
+		}
 
-                // are we at apache camel, then inject other Camel modules that are not in the spring-boot-application yet
-                // TODO - Check with F8 how we will manage that
-                /*
-                if ("camel".equals(id)) {
-                    SpringBootDependencyDTO dto = new SpringBootDependencyDTO(groupName, "camel-zipkin-starter", "Apache Camel Zipkin", "Distributed tracing with an existing Zipkin installation with Apache Camel.");
-                    String version = SpringBootVersionHelper.getVersion("camel.version");
-                    dto.setMavenCoord("org.apache.camel", "camel-zipkin", version);
-                    list.add(dto);
-                }*/
-            }
-        }
+		return list;
+	}
 
-        // and then add the fabric8 group
-        // TODO - Check with F8 how we will manage that
-        /*
-        String version = SpringBootVersionHelper.getVersion("fabric8.spring.cloud.kubernetes.version");
-        SpringBootDependencyDTO dto = new SpringBootDependencyDTO("Fabric8", "spring-cloud-kubernetes", "Spring Cloud Kubernetes", "Kubernetes integration with Spring Cloud");
-        dto.setMavenCoord("io.fabric8", "spring-cloud-starter-kubernetes-all", version);
-        list.add(dto);
-        */
+	@Override protected boolean isProjectRequired() {
+		return false;
+	}
 
-        return list;
-    }
+	@Override public UICommandMetadata getMetadata(UIContext context) {
+		return Metadata.from(super.getMetadata(context), getClass())
+				.category(Categories.create(CATEGORY)).name(CATEGORY + ": New Project")
+				.description("Create a new Spring Boot project");
+	}
 
-    @Override
-    protected boolean isProjectRequired() {
-        return false;
-    }
+	@Override public Result execute(UIExecutionContext context) throws Exception {
+		UIContext uiContext = context.getUIContext();
+		UIOutput uiOutput = uiContext.getProvider().getOutput();
 
-    @Override
-    public UICommandMetadata getMetadata(UIContext context) {
-        return Metadata.from(super.getMetadata(context), getClass())
-                .category(Categories.create(CATEGORY))
-                .name(CATEGORY + ": New Project")
-                .description("Create a new Spring Boot project");
-    }
+		Project project = (Project) uiContext.getAttributeMap().get(Project.class);
+		if (project == null) {
+			project = getSelectedProject(context.getUIContext());
+		}
+		MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
 
-    @Override
-    public Result execute(UIExecutionContext context) throws Exception {
-        UIContext uiContext = context.getUIContext();
-        UIOutput uiOutput = uiContext.getProvider().getOutput();
+		String projectName = metadataFacet.getProjectName();
+		String groupId = metadataFacet.getProjectGroupName();
+		String version = metadataFacet.getProjectVersion();
+		File folder = project.getRoot().reify(DirectoryResource.class)
+				.getUnderlyingResourceObject();
 
-        Project project = (Project) uiContext.getAttributeMap().get(Project.class);
-        if (project == null) {
-            project = getSelectedProject(context.getUIContext());
-        }
-        MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
+		Map<String, SpringBootDependencyDTO> selectedDTOs = new HashMap<>();
+		int[] selected = dependencies.getSelectedIndexes();
+		CollectionStringBuffer csbSpringBoot = new CollectionStringBuffer(",");
+		CollectionStringBuffer csbFabric8 = new CollectionStringBuffer(",");
+		for (int val : selected) {
+			SpringBootDependencyDTO dto = choices.get(val);
+			csbSpringBoot.append(dto.getId());
+			selectedDTOs.put(dto.getId(), dto);
+		}
+		String springBootDeps = csbSpringBoot.toString();
 
-        String projectName = metadataFacet.getProjectName();
-        String groupId = metadataFacet.getProjectGroupName();
-        String version = metadataFacet.getProjectVersion();
-        File folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
+		// boot version need the RELEASE suffix
+		String bootVersion = springBootVersion.getValue() + ".RELEASE";
 
-        Map<String, SpringBootDependencyDTO> selectedDTOs = new HashMap<>();
-        int[] selected = dependencies.getSelectedIndexes();
-        CollectionStringBuffer csbSpringBoot = new CollectionStringBuffer(",");
-        CollectionStringBuffer csbFabric8 = new CollectionStringBuffer(",");
-        for (int val : selected) {
-            SpringBootDependencyDTO dto = choices.get(val);
-            // TODO - Check with F8 how we will manage that
-            if (isFabric8Dependency(dto.getId())) {
-                csbFabric8.append(dto.getId());
-            } else {
-                csbSpringBoot.append(dto.getId());
-            }
-            selectedDTOs.put(dto.getId(), dto);
-        }
-        String springBootDeps = csbSpringBoot.toString();
-        String fabric8Deps = csbFabric8.toString();
-        // boot version need the RELEASE suffix
-        String bootVersion = springBootVersion.getValue() + ".RELEASE";
+		String url = String
+				.format("%s?bootVersion=%s&groupId=%s&artifactId=%s&version=%s&packageName=%s&dependencies=%s",
+						STARTER_URL, bootVersion, groupId, projectName, version, groupId,
+						springBootDeps);
 
-        String url = String.format("%s?bootVersion=%s&groupId=%s&artifactId=%s&version=%s&packageName=%s&dependencies=%s",
-                STARTER_URL, bootVersion, groupId, projectName, version, groupId, springBootDeps);
+		LOG.info("About to query url: " + url);
+		uiOutput.info(uiOutput.out(), "About to query url: " + url);
 
-        LOG.info("About to query url: " + url);
-        uiOutput.info(uiOutput.out(),"About to query url: " + url);
+		// use http client to call start.spring.io that creates the project
+		OkHttpClient client = createOkHttpClient();
 
-        // use http client to call start.spring.io that creates the project
-        OkHttpClient client = createOkHttpClient();
+		Request request = new Request.Builder().url(url).build();
 
-        Request request = new Request.Builder().url(url).build();
+		Response response = client.newCall(request).execute();
+		InputStream is = response.body().byteStream();
 
-        Response response = client.newCall(request).execute();
-        InputStream is = response.body().byteStream();
+		// some archetypes might not use maven or use the maven source layout so lets remove
+		// the pom.xml and src folder if its already been pre-created
+		// as these will be created if necessary via the archetype jar's contents
+		File pom = new File(folder, "pom.xml");
+		if (pom.isFile() && pom.exists()) {
+			pom.delete();
+		}
+		File src = new File(folder, "src");
+		if (src.isDirectory() && src.exists()) {
+			recursiveDelete(src);
+		}
 
-        // some archetypes might not use maven or use the maven source layout so lets remove
-        // the pom.xml and src folder if its already been pre-created
-        // as these will be created if necessary via the archetype jar's contents
-        File pom = new File(folder, "pom.xml");
-        if (pom.isFile() && pom.exists()) {
-            pom.delete();
-        }
-        File src = new File(folder, "src");
-        if (src.isDirectory() && src.exists()) {
-            recursiveDelete(src);
-        }
+		File name = new File(folder, projectName + ".zip");
+		if (name.exists()) {
+			name.delete();
+		}
 
-        File name = new File(folder, projectName + ".zip");
-        if (name.exists()) {
-            name.delete();
-        }
+		FileOutputStream fos = new FileOutputStream(name, false);
+		copyAndCloseInput(is, fos);
+		close(fos);
 
-        FileOutputStream fos = new FileOutputStream(name, false);
-        copyAndCloseInput(is, fos);
-        close(fos);
+		// unzip the download from spring starter
+		unzip(name, folder);
 
-        // unzip the download from spring starter
-        unzip(name, folder);
+		LOG.info("Unzipped file to folder: {}", folder.getAbsolutePath());
+		uiOutput.info(uiOutput.out(),
+				"Unzipped file to folder: " + folder.getAbsolutePath());
 
-        LOG.info("Unzipped file to folder: {}", folder.getAbsolutePath());
-        uiOutput.info(uiOutput.out(),"Unzipped file to folder: " + folder.getAbsolutePath());
+		// and delete the zip file
+		name.delete();
 
-
-        // and delete the zip file
-        name.delete();
-
-        // TODO - Check with F8 how we will manage that
-        if (!Strings.isEmpty(fabric8Deps)) {
-            addFabric8DependenciesToPom(project, fabric8Deps, selectedDTOs);
-        }
-
-        // are there any fabric8 dependencies to add afterwards?
-        return Results.success("Created new Spring Boot project in directory: " + folder.getName());
-    }
-
-    // TODO - Check with F8 how we will manage that
-    private void addFabric8DependenciesToPom(Project project, String fabric8Deps, Map<String, SpringBootDependencyDTO> selectedDTOs) {
-        String[] deps = fabric8Deps.split(",");
-        for (String dep : deps) {
-            SpringBootDependencyDTO dto = selectedDTOs.get(dep);
-            if (dto != null) {
-                DependencyBuilder dp = DependencyBuilder.create().setGroupId(dto.getGroupId()).setArtifactId(dto.getArtifactId()).setVersion(dto.getVersion());
-                dependencyInstaller.install(project, dp);
-            }
-        }
-    }
-
-    // TODO - Check with F8 how we will manage that
-    private boolean isFabric8Dependency(String depId) {
-        for (String id : fabric8Deps) {
-            if (depId.equals(id)) {
-                return true;
-            }
-        }
-        return false;
-    }
+		// are there any fabric8 dependencies to add afterwards?
+		return Results.success(
+				"Created new Spring Boot project in directory: " + folder.getName());
+	}
 
 }
