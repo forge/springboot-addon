@@ -42,6 +42,7 @@ import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
+import org.jboss.forge.addon.ui.output.UIOutput;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
@@ -199,6 +200,8 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
     @Override
     public Result execute(UIExecutionContext context) throws Exception {
         UIContext uiContext = context.getUIContext();
+        UIOutput uiOutput = uiContext.getProvider().getOutput();
+
         Project project = (Project) uiContext.getAttributeMap().get(Project.class);
         if (project == null) {
             project = getSelectedProject(context.getUIContext());
@@ -233,6 +236,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
                 STARTER_URL, bootVersion, groupId, projectName, version, groupId, springBootDeps);
 
         LOG.info("About to query url: " + url);
+        uiOutput.info(uiOutput.out(),"About to query url: " + url);
 
         // use http client to call start.spring.io that creates the project
         OkHttpClient client = createOkHttpClient();
@@ -267,6 +271,8 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
         unzip(name, folder);
 
         LOG.info("Unzipped file to folder: {}", folder.getAbsolutePath());
+        uiOutput.info(uiOutput.out(),"Unzipped file to folder: " + folder.getAbsolutePath());
+
 
         // and delete the zip file
         name.delete();
