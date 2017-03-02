@@ -83,14 +83,14 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
 	public SpringBootNewProjectCommand() {
 		SPRING_BOOT_DEFAULT_VERSION =
-				System.getenv("spring.boot.default.version") != null ?
-						System.getenv("spring.boot.default.version") :
+				System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null ?
+						System.getenv("SPRING_BOOT_DEFAULT_VERSION") :
 						"1.4.1";
-		SPRING_BOOT_VERSIONS = System.getenv("spring.boot.versions") != null ?
-				splitVersions(System.getenv("spring.boot.versions")) :
+		SPRING_BOOT_VERSIONS = System.getenv("SPRING_BOOT_DEFAULT_VERSIONS") != null ?
+				splitVersions(System.getenv("SPRING_BOOT_DEFAULT_VERSIONS")) :
 				new String[] { "1.3.8", "1.4.1" };
 
-		SPRING_BOOT_CONFIG_FILE = System.getenv("spring.boot.config.file");
+		SPRING_BOOT_CONFIG_FILE = System.getenv("SPRING_BOOT_CONFIG_FILE");
 	}
 
 	@Inject
@@ -282,8 +282,8 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 		// Check if we have a Spring Boot Config File
 		if (SPRING_BOOT_CONFIG_FILE != null) {
 			Yaml yaml = new Yaml();
-			InputStream input = new URL("SPRING_BOOT_CONFIG_FILE").openStream();
-			uiOutput.info(uiOutput.out(),"Will use the Spring Boot Config file : " + SPRING_BOOT_CONFIG_FILE);
+			InputStream input = new URL(SPRING_BOOT_CONFIG_FILE).openStream();
+			//uiOutput.info(uiOutput.out(),"Will use the Spring Boot Config file : " + SPRING_BOOT_CONFIG_FILE);
 			Map data = (Map) yaml.load(input);
 			Map initializer = (Map) data.get("initializr");
 			deps = (List) initializer.get("dependencies");
