@@ -20,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +43,7 @@ import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
+import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
@@ -92,6 +95,18 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
 		SPRING_BOOT_CONFIG_FILE = System.getenv("SPRING_BOOT_CONFIG_FILE");
 	}
+
+	@Inject
+	@WithAttributes(label = "groupid", description = "Maven GroupId", defaultValue = "org.example")
+	private UIInput<String> groupid;
+
+	@Inject
+	@WithAttributes(label = "named", description = "Maven ArtifactId and name of the project", defaultValue = "demo")
+	private UIInput<String> named;
+
+	@Inject
+	@WithAttributes(label = "version", description = "Maven version", defaultValue = "1.0.0-SNASPHOT")
+	private UIInput<String> version;
 
 	@Inject
 	@WithAttributes(label = "Spring Boot Version", required = true, description = "Spring Boot Version to use")
@@ -153,7 +168,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 			return null;
 		});
 
-		builder.add(springBootVersion).add(dependencies);
+		builder.add(groupid).add(named).add(version).add(springBootVersion).add(dependencies);
 	}
 
 	private List<SpringBootDependencyDTO> initDependencies() throws Exception {
@@ -201,13 +216,27 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 		if (project == null) {
 			project = getSelectedProject(context.getUIContext());
 		}
-		MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
 
-		String projectName = metadataFacet.getProjectName();
-		String groupId = metadataFacet.getProjectGroupName();
-		String version = metadataFacet.getProjectVersion();
-		File folder = project.getRoot().reify(DirectoryResource.class)
-				.getUnderlyingResourceObject();
+		String projectName;
+		String projectGroupId;
+		String projectVersion;
+		File folder;
+
+		try {
+			LOG.error("Maven project exists. So, we will use its GAV data");
+			MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
+			projectName = metadataFacet.getProjectName();
+			projectGroupId = metadataFacet.getProjectGroupName();
+			projectVersion = metadataFacet.getProjectVersion();
+			folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
+			uiOutput.info(uiOutput.out(),"Maven project exists");
+		} catch (Exception e) {
+			LOG.debug("No maven project exists");
+			projectName = named.getValue();
+			projectGroupId = groupid.getValue();
+			projectVersion = version.getValue();
+			folder = Paths.get(System.getProperty("user.dir")).toFile();
+		}
 
 		Map<String, SpringBootDependencyDTO> selectedDTOs = new HashMap<>();
 		int[] selected = dependencies.getSelectedIndexes();
@@ -225,7 +254,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand {
 
 		String url = String
 				.format("%s?bootVersion=%s&groupId=%s&artifactId=%s&version=%s&packageName=%s&dependencies=%s",
-						STARTER_ZIP_URL, bootVersion, groupId, projectName, version, groupId,
+						STARTER_ZIP_URL, bootVersion, projectGroupId, projectName, projectVersion, projectGroupId,
 						springBootDeps);
 
 		LOG.info("About to query url: " + url);
