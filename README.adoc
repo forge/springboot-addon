@@ -119,7 +119,7 @@ spring-boot-new-project --spring-boot-version 1.4.3 --dependencies actuator web
 ----
 
 Use your Config File::
-If you want to use a YAML config file containing the dependencies to be used for your project, you can create such a file according to the convention definec by
+If you want to use a YAML config file containing the dependencies to be used for your project, you can create such a file according to the convention defined by
 http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#configuration-format[Spring Initialzr] and pass the reference to this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
 +
 [source,java]
@@ -128,3 +128,5 @@ export SPRING_BOOT_CONFIG_FILE=file:///path/to/your/spring-boot-application.yaml
 
 spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
 ----
++
+An example of such a file is src/main/resources/spring-boot-application.yaml[available]
