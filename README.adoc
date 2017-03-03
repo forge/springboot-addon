@@ -62,7 +62,10 @@ forge
 ...
 To quit the shell, type 'exit'.
 
-[Temp]$ project-new --named example --version 1.0.0-SNAPSHOT --top-level-package org.demo --type spring-boot
+[Temp]$ project-new --named example \
+                    --version 1.0.0-SNAPSHOT \
+                    --top-level-package org.demo \
+                    --type spring-boot
 ----
 +
 And that's it!
@@ -72,7 +75,11 @@ To specify the Spring Boot version to be used, pass as parameter this attribute 
 +
 [source,java]
 ----
-project-new --named example --version 1.0.0-SNAPSHOT --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.1
+project-new --named example \
+            --version 1.0.0-SNAPSHOT  \
+            --top-level-package org.demo  \
+            --type spring-boot  \
+            --spring-boot-version 1.4.1
 ----
 
 If you don't specify the version, than a list will be displayed where one of the item is the default value.
