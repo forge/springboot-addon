@@ -163,7 +163,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       for (Object dep : fetchDependencies())
       {
          Map group = (Map) dep;
-         String groupName = (String) group.get("name");
+         String groupName = group.get("name").toString();
          List content;
          // Add this test as the json file & yaml file uses a different key
          if (group.get("content") != null)
@@ -177,9 +177,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
          for (Object row : content)
          {
             Map item = (Map) row;
-            String id = (String) item.get("id");
-            String name = (String) item.get("name");
-            String description = (String) item.get("description");
+            String id = item.get("id").toString();
+            String name = item.get("name").toString();
+            String description = item.get("description").toString();
             list.add(new SpringBootDependencyDTO(groupName, id, name, description));
          }
       }
