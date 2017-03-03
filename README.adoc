@@ -53,8 +53,8 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |===
 
 == Features
-Setup a Maven Project::
-First, create a maven project where the groupId is by example `org.demo`, the artifact which is also the name o fthe folder `spring-boot` and the version `1.0`
+Setup a Spring Boot Project::
+First, create a Spring Boot project where the groupId or top level package is by example `org.demo`, the artifact which is also the name of the folder `example` and the version `1.0.0-SNAPSHOT`
 using the Forge shell
 +
 ----
@@ -62,36 +62,27 @@ forge
 ...
 To quit the shell, type 'exit'.
 
-[Temp]$ project-new --named spring-boot --version 1.0 --top-level-package org.demo
-----
-
-New Project command::
-Next, just type `spring-boot-new-project` if you're in shell.
-It should read Spring Boot: New Project if you're in a GUI environment:
-+
-[source,java]
-----
-spring-boot-new-project
+[Temp]$ project-new --named example --version 1.0.0-SNAPSHOT --top-level-package org.demo --type spring-boot
 ----
 +
 And that's it!
 
-Select the Version::
+Specify Version::
 To specify the Spring Boot version to be used, pass as parameter this attribute `--spring-boot-version `
 +
 [source,java]
 ----
-spring-boot-new-project --spring-boot-version 1.4.1
+project-new --named example --version 1.0.0-SNAPSHOT --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.1
 ----
 
 If you don't specify the version, than a list will be displayed where one of the item is the default value.
 
 Add Dependency::
-You can install Spring Boot dependencies by using the command `spring-boot-new-project` followed by the parameter `--dependencies`:
+You can install Spring Boot dependencies by using the command `spring-boot-setup-project` followed by the parameter `--dependencies`:
 +
 [source,java]
 ----
-spring-boot-new-project --dependencies
+spring-boot-setup-project --dependencies
 Display all 113 possibilities? (y or n)
 activiti                       cassandra                      cluster-redis                  feign                          jms-hornetq                    neo4j                          sleuth-stream                  websocket
 actuator                       circuit-breaker-pcf            cluster-zookeeper              flyway                         jooq                           postgresql                     solr                           zipkin-client
@@ -115,7 +106,7 @@ You can choose any dependency you want to install.
 If you know which dependencies you need, you can pass them as a list of items separated by a space. Here is an example where you will pass the dependency
 about `web` and `actuator`
 ----
-spring-boot-new-project --spring-boot-version 1.4.3 --dependencies actuator web
+spring-boot-setup-project --spring-boot-version 1.4.3 --dependencies actuator web
 ----
 
 Use your Config File::

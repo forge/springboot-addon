@@ -1,9 +1,16 @@
+/*
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.jboss.forge.addon.springboot;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.shell.test.ShellTest;
+import org.jboss.forge.addon.springboot.commands.SetupProjectCommand;
 import org.jboss.forge.addon.ui.controller.CommandController;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.test.UITestHarness;
@@ -28,7 +35,6 @@ public class SetupCommandTest {
 	private ShellTest shellTest;
 
 	private Project project;
-	private String springBootVersion;
 
 	@Before
 	public void setUp() throws Exception {
@@ -49,24 +55,24 @@ public class SetupCommandTest {
 	@Test
 	public void checkCommandMetadata() throws Exception {
 		CommandController controller = uiTestHarness
-				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
+				.createCommandController(SetupProjectCommand.class, project.getRoot());
 		controller.initialize();
 		// Checks the command metadata
-		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
-		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller.getCommand();
+		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
+		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller.getCommand();
 		UICommandMetadata metadata = controller.getMetadata();
-		assertEquals("Spring Boot: New Project", metadata.getName());
+		assertEquals("Spring Boot: Setup Project", metadata.getName());
 		assertEquals("Spring Boot", metadata.getCategory().getName());
 	}
 
 	@Test
 	public void checkSpringBootVersion() throws Exception {
 		CommandController controller = uiTestHarness
-				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
+				.createCommandController(SetupProjectCommand.class, project.getRoot());
 		controller.initialize();
 		// Checks the command metadata
-		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
-		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller
+		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
+		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller
 				.getCommand();
 		if (System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null) {
 			assertEquals("1.5.1", springBootCommand.getSpringBootDefaultVersion());
@@ -79,11 +85,11 @@ public class SetupCommandTest {
 	@Test
 	public void checkSpringBootVersions() throws Exception {
 		CommandController controller = uiTestHarness
-				.createCommandController(SpringBootNewProjectCommand.class, project.getRoot());
+				.createCommandController(SetupProjectCommand.class, project.getRoot());
 		controller.initialize();
 		// Checks the command metadata
-		assertTrue(controller.getCommand() instanceof SpringBootNewProjectCommand);
-		SpringBootNewProjectCommand springBootCommand = (SpringBootNewProjectCommand) controller.getCommand();
+		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
+		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller.getCommand();
 		String[] versions = springBootCommand.getSpringBootVersions();
 		if (System.getenv("SPRING_BOOT_VERSIONS") != null) {
 			assertEquals("1.4.3",versions[2]);

@@ -1,50 +1,35 @@
-/**
- * Copyright 2005-2015 Red Hat, Inc.
- * <p/>
- * Red Hat licenses this file to you under the Apache License, version
- * 2.0 (the "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied.  See the License for the specific language governing
- * permissions and limitations under the License.
+/*
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at
+ * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.jboss.forge.addon.springboot;
+package org.jboss.forge.addon.springboot.commands;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.maven.model.Model;
-import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
+import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
-import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
@@ -55,24 +40,22 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDelete;
-import static org.jboss.forge.addon.springboot.IOHelper.close;
-import static org.jboss.forge.addon.springboot.IOHelper.copyAndCloseInput;
-import static org.jboss.forge.addon.springboot.OkHttpClientHelper.createOkHttpClient;
-import static org.jboss.forge.addon.springboot.UnzipHelper.unzip;
+import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
+import static org.jboss.forge.addon.springboot.utils.IOHelper.close;
+import static org.jboss.forge.addon.springboot.utils.IOHelper.copyAndCloseInput;
+import static org.jboss.forge.addon.springboot.utils.OkHttpClientHelper.createOkHttpClient;
+import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
 
-public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
+public class SetupProjectCommand extends AbstractSpringBootCommand
 {
 
    private static final transient Logger LOG = LoggerFactory
-            .getLogger(SpringBootNewProjectCommand.class);
+            .getLogger(SetupProjectCommand.class);
 
    // lets use a different category for this command
    private static final String CATEGORY = "Spring Boot";
@@ -86,7 +69,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
 
    private UIOutput uiOutput;
 
-   public SpringBootNewProjectCommand()
+   public SetupProjectCommand()
    {
       SPRING_BOOT_DEFAULT_VERSION =
                System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null ?
@@ -94,22 +77,10 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
                         "1.4.1";
       SPRING_BOOT_VERSIONS = System.getenv("SPRING_BOOT_VERSIONS") != null ?
                splitVersions(System.getenv("SPRING_BOOT_VERSIONS")) :
-               new String[] { "1.3.8", "1.4.1" };
+               new String[] { "1.3.8", "1.4.1", "1.4.3" };
 
       SPRING_BOOT_CONFIG_FILE = System.getenv("SPRING_BOOT_CONFIG_FILE");
    }
-
-   @Inject
-   @WithAttributes(label = "groupid", description = "Maven GroupId", defaultValue = "org.example")
-   private UIInput<String> groupid;
-
-   @Inject
-   @WithAttributes(label = "named", description = "Maven ArtifactId and name of the project", defaultValue = "demo")
-   private UIInput<String> named;
-
-   @Inject
-   @WithAttributes(label = "version", description = "Maven version", defaultValue = "1.0.0-SNASPHOT")
-   private UIInput<String> version;
 
    @Inject
    @WithAttributes(label = "Spring Boot Version", description = "Spring Boot Version to use")
@@ -182,7 +153,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
          return null;
       });
 
-      builder.add(groupid).add(named).add(version).add(springBootVersion).add(dependencies);
+      builder.add(springBootVersion).add(dependencies);
    }
 
    private List<SpringBootDependencyDTO> initDependencies() throws Exception
@@ -226,7 +197,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
    public UICommandMetadata getMetadata(UIContext context)
    {
       return Metadata.from(super.getMetadata(context), getClass())
-               .category(Categories.create(CATEGORY)).name(CATEGORY + ": New Project")
+               .category(Categories.create(CATEGORY)).name(CATEGORY + ": Setup Project")
                .description("Create a new Spring Boot project");
    }
 
@@ -234,56 +205,21 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
    public Result execute(UIExecutionContext context) throws Exception
    {
       UIContext uiContext = context.getUIContext();
-
-      /*
-      SpringBootProjectType springBootProjectType = new SpringBootProjectType();
-      Project project = projectFactory.createTempProject(springBootProjectType.getRequiredFacets());
-      MavenFacet mavenFacet = project.getFacet(MavenFacet.class);
-      Model model = mavenFacet.getModel();
-      model.setArtifactId(named.getValue());
-      model.setGroupId(groupid.getValue());
-      model.setVersion(version.getValue());
-
-      String projectName = model.getArtifactId();
-      String projectGroupId = model.getGroupId();
-      String projectVersion = model.getVersion();
-      File folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
-      */
-
       Project project = (Project) uiContext.getAttributeMap().get(Project.class);
       if (project == null)
       {
          project = getSelectedProject(context.getUIContext());
       }
 
-      String projectName;
-      String projectGroupId;
-      String projectVersion;
-      File folder;
-
-      try
-      {
-         LOG.error("Maven project exists. So, we will use its GAV data");
-         MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
-         projectName = metadataFacet.getProjectName();
-         projectGroupId = metadataFacet.getProjectGroupName();
-         projectVersion = metadataFacet.getProjectVersion();
-         folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
-         uiOutput.info(uiOutput.out(), "Maven project exists");
-      }
-      catch (Exception e)
-      {
-         LOG.debug("No maven project exists");
-         projectName = named.getValue();
-         projectGroupId = groupid.getValue();
-         projectVersion = version.getValue();
-         folder = Paths.get(System.getProperty("user.dir")).toFile();
-      }
+      MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
+      String projectName = metadataFacet.getProjectName();
+      String projectGroupId = metadataFacet.getProjectGroupName();
+      String projectVersion = metadataFacet.getProjectVersion();
+      File folder = project.getRoot().reify(DirectoryResource.class).getUnderlyingResourceObject();
 
       Map<String, SpringBootDependencyDTO> selectedDTOs = new HashMap<>();
       int[] selected = dependencies.getSelectedIndexes();
       CollectionStringBuffer csbSpringBoot = new CollectionStringBuffer(",");
-      CollectionStringBuffer csbFabric8 = new CollectionStringBuffer(",");
       for (int val : selected)
       {
          SpringBootDependencyDTO dto = choices.get(val);
@@ -301,7 +237,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
                         springBootDeps);
 
       LOG.info("About to query url: " + url);
-      uiOutput.info(uiOutput.out(), "About to query url: " + url);
+      uiOutput.info(uiOutput.out(), "About to query spring starter: " + url);
 
       // use http client to call start.spring.io that creates the project
       OkHttpClient client = createOkHttpClient();
@@ -357,7 +293,6 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
       {
          Yaml yaml = new Yaml();
          InputStream input = new URL(SPRING_BOOT_CONFIG_FILE).openStream();
-         //uiOutput.info(uiOutput.out(),"Will use the Spring Boot Config file : " + SPRING_BOOT_CONFIG_FILE);
          Map data = (Map) yaml.load(input);
          Map initializer = (Map) data.get("initializr");
          deps = (List) initializer.get("dependencies");
@@ -372,60 +307,7 @@ public class SpringBootNewProjectCommand extends AbstractSpringBootCommand
          Map data = jsonToMap(response.body().string());
          Map dependencies = (Map) data.get("dependencies");
          deps = (List) dependencies.get("values");
-         //uiOutput.error(uiOutput.err(),"Dependencies : " + deps);
       }
       return deps;
    }
-
-   private Map<String, Object> jsonToMap(String content) throws IOException
-   {
-      HashMap<String, Object> result = new ObjectMapper().readValue(content, HashMap.class);
-      JSONObject jObject = new JSONObject(result);
-      return toMap(jObject);
-   }
-
-   private Map<String, Object> toMap(JSONObject object) throws JSONException
-   {
-      Map<String, Object> map = new HashMap<String, Object>();
-
-      Iterator<String> keysItr = object.keys();
-      while (keysItr.hasNext())
-      {
-         String key = keysItr.next();
-         Object value = object.get(key);
-
-         if (value instanceof JSONArray)
-         {
-            value = toList((JSONArray) value);
-         }
-
-         else if (value instanceof JSONObject)
-         {
-            value = toMap((JSONObject) value);
-         }
-         map.put(key, value);
-      }
-      return map;
-   }
-
-   private List<Object> toList(JSONArray array) throws JSONException
-   {
-      List<Object> list = new ArrayList<Object>();
-      for (int i = 0; i < array.length(); i++)
-      {
-         Object value = array.get(i);
-         if (value instanceof JSONArray)
-         {
-            value = toList((JSONArray) value);
-         }
-
-         else if (value instanceof JSONObject)
-         {
-            value = toMap((JSONObject) value);
-         }
-         list.add(value);
-      }
-      return list;
-   }
-
 }
