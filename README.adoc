@@ -71,7 +71,7 @@ To quit the shell, type 'exit'.
 And that's it!
 
 Specify Version::
-To specify the Spring Boot version to be used, pass as parameter this attribute `--spring-boot-version `
+To specify the Spring Boot version to be used, pass as parameter this attribute `--spring-boot-version`
 +
 [source,java]
 ----
@@ -85,7 +85,7 @@ project-new --named example \
 If you don't specify the version, than a list will be displayed where one of the item is the default value.
 
 Add Dependency::
-You can install Spring Boot dependencies by using the command `spring-boot-setup-project` followed by the parameter `--dependencies`:
+You can install Spring Boot dependencies by using the command spring-boot-setup-project` followed by the parameter `--dependencies`:
 +
 [source,java]
 ----
@@ -114,6 +114,13 @@ If you know which dependencies you need, you can pass them as a list of items se
 about `web` and `actuator`
 ----
 spring-boot-setup-project --spring-boot-version 1.4.3 --dependencies actuator web
+----
+
+One line:
+You can also create your project using one command line with the required parameters:
++
+----
+project-new --named demo --version 1.0 --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.3 --dependencies actuator elasticsearch
 ----
 
 Use your Config File::

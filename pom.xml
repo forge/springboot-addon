@@ -82,6 +82,11 @@
       <artifactId>parser-yaml</artifactId>
       <classifier>forge-addon</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.forge.addon</groupId>
+      <artifactId>parser-json</artifactId>
+      <classifier>forge-addon</classifier>
+    </dependency>
 
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
@@ -104,13 +109,6 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-
-    <!-- JSon to objects -->
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20160212</version>
     </dependency>
 
     <!-- Testing -->
