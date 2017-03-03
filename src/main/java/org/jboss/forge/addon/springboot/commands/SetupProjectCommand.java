@@ -162,9 +162,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
 
       for (Object dep : fetchDependencies())
       {
-         Map group = (Map) dep;
+         Map<String,Object> group = (Map) dep;
          String groupName = group.get("name").toString();
-         List content;
+         List<Map<String,String>> content;
          // Add this test as the json file & yaml file uses a different key
          if (group.get("content") != null)
          {
@@ -176,7 +176,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
          }
          for (Object row : content)
          {
-            Map item = (Map) row;
+            Map<String, Object> item = (Map) row;
             String id = item.get("id").toString();
             String name = item.get("name").toString();
             String description = item.get("description").toString();
@@ -293,8 +293,8 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       {
          Yaml yaml = new Yaml();
          InputStream input = new URL(SPRING_BOOT_CONFIG_FILE).openStream();
-         Map data = (Map) yaml.load(input);
-         Map initializer = (Map) data.get("initializr");
+         Map<String, Map> data = (Map) yaml.load(input);
+         Map<String,List<Map>> initializer = (Map) data.get("initializr");
          deps = (List) initializer.get("dependencies");
       }
       else
@@ -304,8 +304,8 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
          Request request = new Request.Builder().url(STARTER_URL).build();
          Response response = client.newCall(request).execute();
          // uiOutput.info(uiOutput.out(),"Response received from starter web server : " + response.code());
-         Map data = jsonToMap(response.body().string());
-         Map dependencies = (Map) data.get("dependencies");
+         Map<String,Object> data = jsonToMap(response.body().string());
+         Map<String,List<Map>> dependencies = (Map) data.get("dependencies");
          deps = (List) dependencies.get("values");
       }
       return deps;
