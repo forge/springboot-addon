@@ -184,7 +184,6 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
             list.add(new SpringBootDependencyDTO(groupName, id, name, description));
          }
       }
-
       return list;
    }
 
@@ -239,11 +238,6 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
 
       LOG.info("About to query url: " + url);
       uiOutput.info(uiOutput.out(), "About to query spring starter: " + url);
-
-      // use http client to call start.spring.io that creates the project
-/*      OkHttpClient client = createOkHttpClient();
-      Request request = new Request.Builder().url(url).build();
-      Response response = client.newCall(request).execute();*/
 
       Client client = factory.createClient();
       InputStream is = client.target(url)
