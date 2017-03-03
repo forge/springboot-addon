@@ -17,14 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.ws.rs.client.Client;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
+import org.jboss.forge.addon.rest.ClientFactory;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
 import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -48,7 +47,6 @@ import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDel
 import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
 import static org.jboss.forge.addon.springboot.utils.IOHelper.close;
 import static org.jboss.forge.addon.springboot.utils.IOHelper.copyAndCloseInput;
-import static org.jboss.forge.addon.springboot.utils.OkHttpClientHelper.createOkHttpClient;
 import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
 
 public class SetupProjectCommand extends AbstractSpringBootCommand
@@ -92,6 +90,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
 
    @Inject
    ProjectFactory projectFactory;
+
+   @Inject
+   private ClientFactory factory;
 
    private List<SpringBootDependencyDTO> choices;
 
@@ -197,7 +198,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
    public UICommandMetadata getMetadata(UIContext context)
    {
       return Metadata.from(super.getMetadata(context), getClass())
-               .category(Categories.create(CATEGORY)).name(CATEGORY + ": Setup Project")
+               .category(Categories.create(CATEGORY)).name(CATEGORY + ": Setup")
                .description("Create a new Spring Boot project");
    }
 
@@ -240,10 +241,14 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       uiOutput.info(uiOutput.out(), "About to query spring starter: " + url);
 
       // use http client to call start.spring.io that creates the project
-      OkHttpClient client = createOkHttpClient();
+/*      OkHttpClient client = createOkHttpClient();
       Request request = new Request.Builder().url(url).build();
-      Response response = client.newCall(request).execute();
-      InputStream is = response.body().byteStream();
+      Response response = client.newCall(request).execute();*/
+
+      Client client = factory.createClient();
+      InputStream is = client.target(url)
+                              .request()
+                              .get(InputStream.class);
 
       // some archetypes might not use maven or use the maven source layout so lets remove
       // the pom.xml and src folder if its already been pre-created
@@ -300,11 +305,12 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       else
       {
          // Fetch the dependencies list from the start.spring.io server
-         OkHttpClient client = createOkHttpClient();
-         Request request = new Request.Builder().url(STARTER_URL).build();
-         Response response = client.newCall(request).execute();
-         // uiOutput.info(uiOutput.out(),"Response received from starter web server : " + response.code());
-         Map<String,Object> data = jsonToMap(response.body().string());
+         Client client = factory.createClient();
+         String response = client.target(STARTER_URL)
+                  .request()
+                  .get(String.class);
+
+         Map<String,Object> data = jsonToMap(response);
          Map<String,List<Map>> dependencies = (Map) data.get("dependencies");
          deps = (List) dependencies.get("values");
       }

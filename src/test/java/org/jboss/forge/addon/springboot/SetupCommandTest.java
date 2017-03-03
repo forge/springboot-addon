@@ -61,7 +61,7 @@ public class SetupCommandTest {
 		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
 		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller.getCommand();
 		UICommandMetadata metadata = controller.getMetadata();
-		assertEquals("Spring Boot: Setup Project", metadata.getName());
+		assertEquals("Spring Boot: Setup", metadata.getName());
 		assertEquals("Spring Boot", metadata.getCategory().getName());
 	}
 
