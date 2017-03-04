@@ -73,4 +73,8 @@ public class ConvertHelper
       }
       return list;
    }
+
+   public static String removeDoubleQuotes(Object content) {
+      return content.toString().replaceAll("\"", "");
+   }
 }

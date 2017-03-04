@@ -77,7 +77,7 @@ public class SetupCommandTest {
 		SpringBootDependencyDTO actuatorDTO = new SpringBootDependencyDTO("Ops","actuator","Actuator","Production ready features to help you monitor and manage your application");
 		Iterable<SpringBootDependencyDTO> deps = Arrays.asList(securityDTO, actuatorDTO);
 		controller.setValueFor("dependencies", deps);
-		controller.setValueFor("springBootVersion","1.5.1");
+		controller.setValueFor("springBootVersion","1.3.8");
 
 		Result result = controller.execute();
 		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));

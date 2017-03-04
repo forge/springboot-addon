@@ -44,6 +44,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDelete;
 import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
+import static org.jboss.forge.addon.springboot.utils.ConvertHelper.removeDoubleQuotes;
 import static org.jboss.forge.addon.springboot.utils.IOHelper.close;
 import static org.jboss.forge.addon.springboot.utils.IOHelper.copyAndCloseInput;
 import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
@@ -160,7 +161,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       for (Object dep : fetchDependencies())
       {
          Map<String,Object> group = (Map) dep;
-         String groupName = group.get("name").toString();
+         String groupName = removeDoubleQuotes(group.get("name"));
          List<Map<String,String>> content;
          // Add this test as the json file & yaml file uses a different key
          if (group.get("content") != null)
@@ -174,9 +175,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
          for (Object row : content)
          {
             Map<String, Object> item = (Map) row;
-            String id = item.get("id").toString();
-            String name = item.get("name").toString();
-            String description = item.get("description").toString();
+            String id = removeDoubleQuotes(item.get("id"));
+            String name = removeDoubleQuotes(item.get("name"));
+            String description = removeDoubleQuotes(item.get("description"));
             list.add(new SpringBootDependencyDTO(groupName, id, name, description));
          }
       }
