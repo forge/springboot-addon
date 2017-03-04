@@ -45,7 +45,6 @@ public class ConvertHelper
          if(value instanceof JsonArray) {
             value = toList((JsonArray) value);
          }
-
          else if(value instanceof JsonObject) {
             value = toMap((JsonObject) value);
          }
@@ -64,7 +63,6 @@ public class ConvertHelper
          {
             value = toList((JsonArray) value);
          }
-
          else if (value instanceof JsonObject)
          {
             value = toMap((JsonObject) value);
