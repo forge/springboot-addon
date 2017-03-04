@@ -50,7 +50,6 @@ public class SetupCommandTest {
 		project = projectFactory.createTempProject();
 	}
 
-
 	@Test
 	public void checkCommandMetadata() throws Exception {
 		CommandController controller = uiTestHarness
@@ -62,6 +61,17 @@ public class SetupCommandTest {
 		UICommandMetadata metadata = controller.getMetadata();
 		assertEquals("Spring Boot: Setup", metadata.getName());
 		assertEquals("Spring Boot", metadata.getCategory().getName());
+		Result result = controller.execute();
+		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));
+	}
+
+	@Test
+	public void checkParametersPassed() throws Exception {
+		CommandController controller = uiTestHarness
+					.createCommandController(SetupProjectCommand.class, project.getRoot());
+		controller.initialize();
+		// Checks the command metadata
+		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
 
 		SpringBootDependencyDTO securityDTO = new SpringBootDependencyDTO("Core","security","Security","Secure your application via spring-security");
 		SpringBootDependencyDTO actuatorDTO = new SpringBootDependencyDTO("Ops","actuator","Actuator","Production ready features to help you monitor and manage your application");
