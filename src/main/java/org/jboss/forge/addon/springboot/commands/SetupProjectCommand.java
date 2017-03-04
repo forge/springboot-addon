@@ -52,8 +52,7 @@ import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
 public class SetupProjectCommand extends AbstractSpringBootCommand
 {
 
-   private static final transient Logger LOG = LoggerFactory
-            .getLogger(SetupProjectCommand.class);
+   private static final transient Logger LOG = LoggerFactory.getLogger(SetupProjectCommand.class);
 
    // lets use a different category for this command
    private static final String CATEGORY = "Spring Boot";
@@ -64,6 +63,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
    private static final String STARTER_URL = "https://start.spring.io";
+   private static List<Map> deps = new ArrayList<Map>();
 
    private UIOutput uiOutput;
 
@@ -276,29 +276,33 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
 
    private List fetchDependencies() throws Exception
    {
-      List<Map> deps;
+      if(deps.size() > 0) {
+         return deps;
+      } else {
+         // Check if we have a Spring Boot Config File
+         if (SPRING_BOOT_CONFIG_FILE != null)
+         {
+            uiOutput.info(uiOutput.out(),"Use spring boot yaml config file");
+                     Yaml yaml = new Yaml();
+            InputStream input = new URL(SPRING_BOOT_CONFIG_FILE).openStream();
+            Map<String, Map> data = (Map) yaml.load(input);
+            Map<String,List<Map>> initializer = (Map) data.get("initializr");
+            deps = (List) initializer.get("dependencies");
+         }
+         else
+         {
+            // Fetch the dependencies list from the start.spring.io server
+            uiOutput.info(uiOutput.out(),"Fetch deps from start.spring.io");
+            Client client = factory.createClient();
+            String response = client.target(STARTER_URL)
+                     .request()
+                     .get(String.class);
 
-      // Check if we have a Spring Boot Config File
-      if (SPRING_BOOT_CONFIG_FILE != null)
-      {
-         Yaml yaml = new Yaml();
-         InputStream input = new URL(SPRING_BOOT_CONFIG_FILE).openStream();
-         Map<String, Map> data = (Map) yaml.load(input);
-         Map<String,List<Map>> initializer = (Map) data.get("initializr");
-         deps = (List) initializer.get("dependencies");
+            Map<String,Object> data = jsonToMap(response);
+            Map<String,List<Map>> dependencies = (Map) data.get("dependencies");
+            deps = (List) dependencies.get("values");
+         }
+         return deps;
       }
-      else
-      {
-         // Fetch the dependencies list from the start.spring.io server
-         Client client = factory.createClient();
-         String response = client.target(STARTER_URL)
-                  .request()
-                  .get(String.class);
-
-         Map<String,Object> data = jsonToMap(response);
-         Map<String,List<Map>> dependencies = (Map) data.get("dependencies");
-         deps = (List) dependencies.get("values");
-      }
-      return deps;
    }
 }
