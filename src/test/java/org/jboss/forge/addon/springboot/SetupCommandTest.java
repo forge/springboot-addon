@@ -80,6 +80,7 @@ public class SetupCommandTest {
 		controller.setValueFor("springBootVersion","1.3.8");
 
 		Result result = controller.execute();
+		// TODO - Check with George How to read the pom
 		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));
 	}
 
