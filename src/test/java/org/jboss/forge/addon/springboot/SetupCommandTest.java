@@ -6,8 +6,7 @@
  */
 package org.jboss.forge.addon.springboot;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.projects.Project;
@@ -15,8 +14,10 @@ import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.shell.test.ShellTest;
 import org.jboss.forge.addon.springboot.commands.SetupProjectCommand;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
+import org.jboss.forge.addon.ui.command.AbstractCommandExecutionListener;
+import org.jboss.forge.addon.ui.command.UICommand;
+import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.controller.CommandController;
-import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.test.UITestHarness;
@@ -38,7 +39,6 @@ public class SetupCommandTest {
 
 	private ProjectFactory projectFactory;
 	private UITestHarness uiTestHarness;
-	private ShellTest shellTest;
 
 	private Project project;
 
@@ -47,16 +47,9 @@ public class SetupCommandTest {
 		AddonRegistry addonRegistry = Furnace.instance(getClass().getClassLoader()).getAddonRegistry();
 		projectFactory = addonRegistry.getServices(ProjectFactory.class).get();
 		uiTestHarness = addonRegistry.getServices(UITestHarness.class).get();
-		shellTest = addonRegistry.getServices(ShellTest.class).get();
 		project = projectFactory.createTempProject();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		if (shellTest != null) {
-			shellTest.close();
-		}
-	}
 
 	@Test
 	public void checkCommandMetadata() throws Exception {
@@ -70,10 +63,11 @@ public class SetupCommandTest {
 		assertEquals("Spring Boot: Setup", metadata.getName());
 		assertEquals("Spring Boot", metadata.getCategory().getName());
 
-		SpringBootDependencyDTO springBootDependencyDTO = new SpringBootDependencyDTO("Core","security","Security","Secure your application via spring-security");
-		List<SpringBootDependencyDTO> deps = new ArrayList<SpringBootDependencyDTO>();
-		deps.add(springBootDependencyDTO);
+		SpringBootDependencyDTO securityDTO = new SpringBootDependencyDTO("Core","security","Security","Secure your application via spring-security");
+		SpringBootDependencyDTO actuatorDTO = new SpringBootDependencyDTO("Ops","actuator","Actuator","Production ready features to help you monitor and manage your application");
+		Iterable<SpringBootDependencyDTO> deps = Arrays.asList(securityDTO, actuatorDTO);
 		controller.setValueFor("dependencies", deps);
+		controller.setValueFor("springBootVersion","1.5.1");
 
 		Result result = controller.execute();
 		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));
