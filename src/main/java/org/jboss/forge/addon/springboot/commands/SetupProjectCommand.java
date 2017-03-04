@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.rest.ClientFactory;
@@ -58,9 +57,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
    // lets use a different category for this command
    private static final String CATEGORY = "Spring Boot";
 
+   private static String SPRING_BOOT_CONFIG_FILE;
    private static String SPRING_BOOT_DEFAULT_VERSION;
    private static String[] SPRING_BOOT_VERSIONS;
-   private static String SPRING_BOOT_CONFIG_FILE;
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
    private static final String STARTER_URL = "https://start.spring.io";
@@ -182,12 +181,6 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
          }
       }
       return list;
-   }
-
-   @Override
-   protected boolean isProjectRequired()
-   {
-      return false;
    }
 
    @Override

@@ -96,6 +96,7 @@ public class SetupCommandTest {
 			assertEquals("1.5.1", springBootCommand.getSpringBootDefaultVersion());
 		}
 		else {
+			controller.getValueFor("springBootVersion");
 			assertEquals("1.4.1", springBootCommand.getSpringBootDefaultVersion());
 		}
 	}

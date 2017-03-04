@@ -26,4 +26,10 @@ public abstract class AbstractSpringBootCommand extends AbstractProjectCommand
       return projectFactory;
    }
 
+   @Override
+   protected boolean isProjectRequired()
+   {
+      return true;
+   }
+
 }
