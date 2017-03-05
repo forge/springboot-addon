@@ -8,22 +8,21 @@ package org.jboss.forge.addon.springboot;
 
 import java.util.Arrays;
 
+import org.apache.maven.model.Model;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.maven.resources.MavenModelResource;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
-import org.jboss.forge.addon.shell.test.ShellTest;
 import org.jboss.forge.addon.springboot.commands.SetupProjectCommand;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
-import org.jboss.forge.addon.ui.command.AbstractCommandExecutionListener;
-import org.jboss.forge.addon.ui.command.UICommand;
-import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.controller.CommandController;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.furnace.Furnace;
 import org.jboss.forge.furnace.addons.AddonRegistry;
-import org.junit.After;
+import org.jboss.forge.parser.xml.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,9 +77,13 @@ public class SetupCommandTest {
 		Iterable<SpringBootDependencyDTO> deps = Arrays.asList(securityDTO, actuatorDTO);
 		controller.setValueFor("dependencies", deps);
 		controller.setValueFor("springBootVersion","1.3.8");
-
 		Result result = controller.execute();
-		// TODO - Check with George How to read the pom
+		MavenFacet mavenFacet = project.getFacet(MavenFacet.class);
+		MavenModelResource modelResource = mavenFacet.getModelResource();
+		Model model = modelResource.getCurrentModel();
+		assertEquals("empty-project",model.getArtifactId());
+		assertEquals("unknown",model.getGroupId());
+		assertEquals("0",model.getVersion());
 		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));
 	}
 
