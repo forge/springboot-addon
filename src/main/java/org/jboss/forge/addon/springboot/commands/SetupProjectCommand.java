@@ -38,6 +38,7 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
+import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -49,7 +50,7 @@ import static org.jboss.forge.addon.springboot.utils.IOHelper.close;
 import static org.jboss.forge.addon.springboot.utils.IOHelper.copyAndCloseInput;
 import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
 
-public class SetupProjectCommand extends AbstractSpringBootCommand
+public class SetupProjectCommand extends AbstractSpringBootCommand implements UIWizardStep
 {
 
    private static final transient Logger LOG = LoggerFactory.getLogger(SetupProjectCommand.class);
@@ -64,8 +65,6 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
    private static final String STARTER_URL = "https://start.spring.io";
    private static List<Map> deps = new ArrayList<Map>();
-
-   private UIOutput uiOutput;
 
    public SetupProjectCommand()
    {
@@ -101,13 +100,13 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
    @Override
    public void initializeUI(UIBuilder builder) throws Exception
    {
-      uiOutput = builder.getUIContext().getProvider().getOutput();
+      UIOutput uiOutput = builder.getUIContext().getProvider().getOutput();
       springBootVersion.setValueChoices(Arrays.asList(SPRING_BOOT_VERSIONS));
       springBootVersion.setDefaultValue(SPRING_BOOT_DEFAULT_VERSION);
 
       try
       {
-         choices = initDependencies();
+         choices = initDependencies(uiOutput);
       }
       catch (Exception e)
       {
@@ -144,11 +143,11 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       builder.add(springBootVersion).add(dependencies);
    }
 
-   private List<SpringBootDependencyDTO> initDependencies() throws Exception
+   private List<SpringBootDependencyDTO> initDependencies(UIOutput uiOutput) throws Exception
    {
       List<SpringBootDependencyDTO> list = new ArrayList<>();
 
-      for (Object dep : fetchDependencies())
+      for (Object dep : fetchDependencies(uiOutput))
       {
          Map<String,Object> group = (Map) dep;
          String groupName = removeDoubleQuotes(group.get("name"));
@@ -186,6 +185,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
    public Result execute(UIExecutionContext context) throws Exception
    {
       UIContext uiContext = context.getUIContext();
+      UIOutput uiOutput = uiContext.getProvider().getOutput();
       Project project = (Project) uiContext.getAttributeMap().get(Project.class);
       if (project == null)
       {
@@ -248,6 +248,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       FileOutputStream fos = new FileOutputStream(name, false);
       copyAndCloseInput(is, fos);
       close(fos);
+      client.close();
 
       // unzip the download from spring starter
       unzip(name, folder);
@@ -264,7 +265,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
                "Created new Spring Boot project in directory: " + folder.getName());
    }
 
-   private List fetchDependencies() throws Exception
+   private List fetchDependencies(UIOutput uiOutput) throws Exception
    {
       if(deps.size() > 0) {
          return deps;
@@ -287,7 +288,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
             String response = client.target(STARTER_URL)
                      .request()
                      .get(String.class);
-
+            client.close();
             Map<String,Object> data = jsonToMap(response);
             Map<String,List<Map>> dependencies = (Map) data.get("dependencies");
             deps = (List) dependencies.get("values");

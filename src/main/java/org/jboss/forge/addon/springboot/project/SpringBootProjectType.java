@@ -19,6 +19,7 @@ import org.jboss.forge.addon.projects.facets.PackagingFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.projects.facets.WebResourcesFacet;
 import org.jboss.forge.addon.projects.stacks.Stack;
+import org.jboss.forge.addon.springboot.commands.SetupProjectCommand;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 public class SpringBootProjectType extends AbstractProjectType
@@ -59,7 +60,7 @@ public class SpringBootProjectType extends AbstractProjectType
    @Override
    public Class<? extends UIWizardStep> getSetupFlow()
    {
-      return SpringBootSetupFlow.class;
+      return SetupProjectCommand.class;
    }
 
    @Override
