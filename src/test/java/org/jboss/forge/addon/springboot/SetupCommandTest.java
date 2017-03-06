@@ -7,8 +7,11 @@
 package org.jboss.forge.addon.springboot;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.maven.resources.MavenModelResource;
@@ -84,6 +87,26 @@ public class SetupCommandTest {
 		assertEquals("empty-project",model.getArtifactId());
 		assertEquals("unknown",model.getGroupId());
 		assertEquals("0",model.getVersion());
+
+		// Check if the parent contains the Spring Boot Artifact & version specified
+		Parent parent = model.getParent();
+		assertEquals("org.springframework.boot",parent.getGroupId());
+		assertEquals("spring-boot-starter-parent",parent.getArtifactId());
+		assertEquals("1.3.8.RELEASE",parent.getVersion());
+
+		Node contents = modelResource.getXmlSource();
+		List<Node> dependenciesNodes = contents.get("dependencies").get(0).getChildren();
+
+		// Check Spring Boot Actuator Dependency
+		List<Node> dependencyActuator = dependenciesNodes.get(0).getChildren();
+		assertEquals("org.springframework.boot",dependencyActuator.get(0).getText());
+		assertEquals("spring-boot-starter-actuator",dependencyActuator.get(1).getText());
+
+		// Check Spring Boot Security Dependency
+		List<Node> dependencySecurity = dependenciesNodes.get(1).getChildren();
+		assertEquals("org.springframework.boot",dependencySecurity.get(0).getText());
+		assertEquals("spring-boot-starter-security",dependencySecurity.get(1).getText());
+
 		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));
 	}
 
@@ -94,30 +117,13 @@ public class SetupCommandTest {
 		controller.initialize();
 		// Checks the command metadata
 		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
-		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller
-				.getCommand();
+		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller.getCommand();
 		if (System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null) {
-			assertEquals("1.5.1", springBootCommand.getSpringBootDefaultVersion());
+			assertEquals("1.5.1", controller.getValueFor("springBootVersion"));
 		}
 		else {
 			controller.getValueFor("springBootVersion");
-			assertEquals("1.4.1", springBootCommand.getSpringBootDefaultVersion());
-		}
-	}
-
-	@Test
-	public void checkSpringBootVersions() throws Exception {
-		CommandController controller = uiTestHarness
-				.createCommandController(SetupProjectCommand.class, project.getRoot());
-		controller.initialize();
-		// Checks the command metadata
-		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
-		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller.getCommand();
-		String[] versions = springBootCommand.getSpringBootVersions();
-		if (System.getenv("SPRING_BOOT_VERSIONS") != null) {
-			assertEquals("1.4.3",versions[2]);
-		} else {
-			assertEquals("1.4.1",versions[1]);
+			assertEquals("1.4.1", controller.getValueFor("springBootVersion"));
 		}
 	}
 

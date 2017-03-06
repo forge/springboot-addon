@@ -98,16 +98,6 @@ public class SetupProjectCommand extends AbstractSpringBootCommand
       return s.split(",");
    }
 
-   public String getSpringBootDefaultVersion()
-   {
-      return SPRING_BOOT_DEFAULT_VERSION;
-   }
-
-   public String[] getSpringBootVersions()
-   {
-      return SPRING_BOOT_VERSIONS;
-   }
-
    @Override
    public void initializeUI(UIBuilder builder) throws Exception
    {
