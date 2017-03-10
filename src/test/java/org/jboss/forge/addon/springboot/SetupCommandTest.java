@@ -9,7 +9,6 @@ package org.jboss.forge.addon.springboot;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.jboss.arquillian.junit.Arquillian;
@@ -17,7 +16,7 @@ import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.maven.resources.MavenModelResource;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
-import org.jboss.forge.addon.springboot.commands.SetupProjectCommand;
+import org.jboss.forge.addon.springboot.commands.setup.SetupProjectCommand;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
 import org.jboss.forge.addon.ui.controller.CommandController;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
