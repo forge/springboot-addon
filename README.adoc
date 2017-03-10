@@ -116,7 +116,7 @@ about `web` and `actuator`
 spring-boot-setup-project --spring-boot-version 1.4.3 --dependencies actuator web
 ----
 
-One line:
+One line::
 You can also create your project using one command line with the required parameters:
 +
 ----
