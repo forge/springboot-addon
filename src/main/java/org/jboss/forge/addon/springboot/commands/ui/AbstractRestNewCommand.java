@@ -32,7 +32,6 @@ import static org.jboss.forge.addon.javaee.JavaEEPackageConstants.DEFAULT_REST_P
  *
  * @author <a href="cmoulliard@redhat.com">Charles Moulliard</a>
  */
-//@StackConstraint(RestFacet.class)
 public abstract class AbstractRestNewCommand<T extends JavaSource<?>> extends AbstractJavaSourceCommand<T>
 {
 
