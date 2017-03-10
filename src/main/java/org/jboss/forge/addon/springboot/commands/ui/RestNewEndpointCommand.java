@@ -49,9 +49,6 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
    @WithAttributes(label = "Path", description = "The root path of the endpoint")
    private UIInput<String> path;
 
-   @Inject
-   private Inflector inflector;
-
    @Override
    public UICommandMetadata getMetadata(UIContext context)
    {
