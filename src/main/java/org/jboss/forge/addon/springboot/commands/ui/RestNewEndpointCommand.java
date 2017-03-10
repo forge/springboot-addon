@@ -6,6 +6,8 @@
  */
 package org.jboss.forge.addon.springboot.commands.ui;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
@@ -80,26 +82,18 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
             throws Exception
    {
 
-      JavaSourceFacet javaSource = project.getFacet(JavaSourceFacet.class);
+      JavaSourceFacet facet = project.getFacet(JavaSourceFacet.class);
 
-      // Create the GreetingProperties java class
-      JavaClassSource greetingProperties = Roaster.create(JavaClassSource.class);
-      greetingProperties.setName("GreetingProperties").setPackage(source.getPackage());
-      greetingProperties.addAnnotation(Component.class);
-      greetingProperties.addAnnotation(ConfigurationProperties.class).setStringValue("greeting");
-      greetingProperties.addProperty(String.class,"message").createAccessor();
+      // Create Java Classes
+      facet.saveJavaSource(createGreetingClass(source));
+      facet.saveJavaSource(createGreetingPropertiesClass(source));
 
-      // Save it
-      javaSource.saveJavaSource(greetingProperties);
-
-      // Add @RestController to the class
+      source.addImport(AtomicLong.class);
       source.addAnnotation(RestController.class);
-
-      // Add GreetingProperties
       source.addField().setPrivate().setFinal(false).setType("GreetingProperties").setName("properties").addAnnotation(Autowired.class);
 
       // Add Counter
-      source.addField().setPrivate().setFinal(true).setType("AtomicLong").setName("counter").setStringInitializer("new AtomicLong()");
+      source.addField().setPrivate().setFinal(true).setType("AtomicLong").setName("counter").setLiteralInitializer("new AtomicLong()");
 
       for (RestMethod method : methods.getValue())
       {
@@ -112,33 +106,40 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
          {
          case GET:
             greeting.addAnnotation(RequestMapping.class).setStringValue("/greeting");
-            greeting.addParameter(String.class,"name").addAnnotation(RequestParam.class).setLiteralValue("value","name").setLiteralValue("defaultValue","world");
-            greeting.setBody("new Greeting(this.counter.incrementAndGet(), String.format(this.properties.getMessage(), name));");
+            greeting.addParameter(String.class,"name").addAnnotation(RequestParam.class).setLiteralValue("value","\"name\"").setLiteralValue("defaultValue","\"world\"");
+            greeting.setBody("return new Greeting(this.counter.incrementAndGet(), String.format(this.properties.getMessage(), name));");
             break;
          case POST:
             source.addImport(UriBuilder.class);
-/*            doGet.addAnnotation(javax.ws.rs.Consumes.class).setStringArrayValue(
-                     new String[] { MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON });
-            doGet.addParameter(String.class, "entity");
-            doGet.setBody("return Response.created(UriBuilder.fromResource(" + getNamed().getValue()
-                     + ".class).build()).build();");*/
+            // TODO
             break;
          case PUT:
-/*            source.addImport(UriBuilder.class);
-            doGet.addAnnotation(javax.ws.rs.Consumes.class).setStringArrayValue(
-                     new String[] { MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON });
-            doGet.addParameter(String.class, "entity");
-            doGet.setBody("return Response.created(UriBuilder.fromResource(" + getNamed().getValue()
-                     + ".class).build()).build();");*/
+            // TODO
             break;
          case DELETE:
-/*            doGet.addAnnotation(Path.class).setStringValue("/{id}");
-            doGet.addParameter(Long.class, "id").addAnnotation(PathParam.class).setStringValue("id");
-            doGet.setBody("return Response.noContent().build();");*/
+            // TODO
             break;
          }
       }
 
+      return source;
+   }
+
+   public JavaClassSource createGreetingPropertiesClass(JavaClassSource current) {
+      JavaClassSource source = Roaster.create(JavaClassSource.class).setName("GreetingProperties").setPackage(current.getPackage());
+      source.addAnnotation(Component.class);
+      source.addAnnotation(ConfigurationProperties.class).setStringValue("greeting");
+      source.addProperty(String.class,"message").getField().setStringInitializer("Hello, %s!");
+      return source;
+   }
+
+   public JavaClassSource createGreetingClass(JavaClassSource current) {
+      JavaClassSource source = Roaster.create(JavaClassSource.class).setName("Greeting").setPackage(current.getPackage());
+      source.addMethod().setPublic().setConstructor(true).setBody("this.id = 0;this.content = null;");
+      source.addMethod().setPublic().setConstructor(true).setParameters("long id, String content").setBody("this.id = id; this.content = content;");
+      source.addProperty(String.class,"content");
+      source.addProperty("long","id");
+      Roaster.format(source.toString());
       return source;
    }
 }
