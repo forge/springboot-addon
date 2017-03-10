@@ -17,6 +17,8 @@ import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
 public abstract class AbstractSpringBootCommand extends AbstractProjectCommand
 {
 
+   protected final String USER_AGENT = "SpringBootForgeCli/" + readVersion();
+
    @Inject
    private ProjectFactory projectFactory;
 
@@ -30,6 +32,10 @@ public abstract class AbstractSpringBootCommand extends AbstractProjectCommand
    protected boolean isProjectRequired()
    {
       return true;
+   }
+
+   protected String readVersion() {
+      return this.getClass().getPackage().getImplementationVersion();
    }
 
 }

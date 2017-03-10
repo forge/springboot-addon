@@ -218,11 +218,13 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
                         springBootDeps);
 
       LOG.info("About to query url: " + url);
+      LOG.info("Version of the User Agent:" + USER_AGENT);
       uiOutput.info(uiOutput.out(), "About to query spring starter: " + url);
 
       Client client = factory.createClient();
       InputStream is = client.target(url)
                               .request()
+                              .header("User-Agent",USER_AGENT)
                               .get(InputStream.class);
 
       // some archetypes might not use maven or use the maven source layout so lets remove
@@ -287,6 +289,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
             Client client = factory.createClient();
             String response = client.target(STARTER_URL)
                      .request()
+                     .header("User-Agent",USER_AGENT)
                      .get(String.class);
             client.close();
             Map<String,Object> data = jsonToMap(response);
