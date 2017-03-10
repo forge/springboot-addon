@@ -89,15 +89,21 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
       facet.saveJavaSource(createGreetingClass(source));
       facet.saveJavaSource(createGreetingPropertiesClass(source));
 
+      FileResource<?> applicationFile = project.getFacet(ResourcesFacet.class).getResource("application.properties");
+      if (!applicationFile.exists()) {
+         applicationFile.createNewFile();
+      }
+
+      StringBuilder sb = new StringBuilder();
+
       if (path.hasValue())
       {
          // Add contextPath within the application.properties file
-         FileResource<?> applicationFile = project.getFacet(ResourcesFacet.class).getResource("application.properties");
-         if (!applicationFile.exists()) {
-            applicationFile.createNewFile();
-         }
-         applicationFile.setContents("server.contextPath=/" + path.getValue());
+         sb.append("server.contextPath=/" + path.getValue());
       }
+      sb.append(System.getProperty("line.separator"));
+      sb.append("greeting.message=Hello, %s!");
+      applicationFile.setContents(sb.toString());
 
       // Create the Controller
       source.addImport(AtomicLong.class);
