@@ -13,6 +13,9 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.facets.ResourcesFacet;
+import org.jboss.forge.addon.resource.FileResource;
+import org.jboss.forge.addon.resource.ResourceFacet;
 import org.jboss.forge.addon.text.Inflector;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
@@ -82,17 +85,25 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
             throws Exception
    {
 
+      // Create Java Classes Greeting and GreetingProperties
       JavaSourceFacet facet = project.getFacet(JavaSourceFacet.class);
-
-      // Create Java Classes
       facet.saveJavaSource(createGreetingClass(source));
       facet.saveJavaSource(createGreetingPropertiesClass(source));
 
+      if (path.hasValue())
+      {
+         // Add contextPath within the application.properties file
+         FileResource<?> applicationFile = project.getFacet(ResourcesFacet.class).getResource("application.properties");
+         if (!applicationFile.exists()) {
+            applicationFile.createNewFile();
+         }
+         applicationFile.setContents("server.contextPath=/" + path.getValue());
+      }
+
+      // Create the Controller
       source.addImport(AtomicLong.class);
       source.addAnnotation(RestController.class);
       source.addField().setPrivate().setFinal(false).setType("GreetingProperties").setName("properties").addAnnotation(Autowired.class);
-
-      // Add Counter
       source.addField().setPrivate().setFinal(true).setType("AtomicLong").setName("counter").setLiteralInitializer("new AtomicLong()");
 
       for (RestMethod method : methods.getValue())
