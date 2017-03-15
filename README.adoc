@@ -13,6 +13,10 @@ This addon provides *standalone* functionality, and *exports services* for use i
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ebcnOopZFWs" frameborder="0" allowfullscreen></iframe>
 ++++
 
+=== Prerequisites
+
+- JBoss Forge >= 3.5
+
 === Installation
 
 From Forge CLI:
