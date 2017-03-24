@@ -109,21 +109,4 @@ public class SetupCommandTest {
 		assertTrue("Created new Spring Boot", result.getMessage().contains("Created new Spring Boot"));
 	}
 
-	@Test
-	public void checkSpringBootVersion() throws Exception {
-		CommandController controller = uiTestHarness
-				.createCommandController(SetupProjectCommand.class, project.getRoot());
-		controller.initialize();
-		// Checks the command metadata
-		assertTrue(controller.getCommand() instanceof SetupProjectCommand);
-		SetupProjectCommand springBootCommand = (SetupProjectCommand) controller.getCommand();
-		if (System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null) {
-			assertEquals("1.5.1", controller.getValueFor("springBootVersion"));
-		}
-		else {
-			controller.getValueFor("springBootVersion");
-			assertEquals("1.4.1", controller.getValueFor("springBootVersion"));
-		}
-	}
-
 }
