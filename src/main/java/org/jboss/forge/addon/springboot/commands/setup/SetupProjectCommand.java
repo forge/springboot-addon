@@ -6,19 +6,6 @@
  */
 package org.jboss.forge.addon.springboot.commands.setup;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.ws.rs.client.Client;
-
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
@@ -42,6 +29,14 @@ import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
+
+import javax.inject.Inject;
+import javax.ws.rs.client.Client;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
 
 import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDelete;
 import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
@@ -68,15 +63,19 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
    public SetupProjectCommand()
    {
-      SPRING_BOOT_DEFAULT_VERSION =
-               System.getenv("SPRING_BOOT_DEFAULT_VERSION") != null ?
-                        System.getenv("SPRING_BOOT_DEFAULT_VERSION") :
-                        "1.4.1";
-      SPRING_BOOT_VERSIONS = System.getenv("SPRING_BOOT_VERSIONS") != null ?
-               splitVersions(System.getenv("SPRING_BOOT_VERSIONS")) :
+      if (SPRING_BOOT_DEFAULT_VERSION == null) {
+         final String bootDefaultVersion = System.getenv("SPRING_BOOT_DEFAULT_VERSION");
+         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : "1.4.1";
+      }
+      if (SPRING_BOOT_VERSIONS == null || SPRING_BOOT_VERSIONS.length == 0) {
+         final String bootVersions = System.getenv("SPRING_BOOT_VERSIONS");
+         SPRING_BOOT_VERSIONS = bootVersions != null ? splitVersions(bootVersions) :
                new String[] { "1.3.8", "1.4.1", "1.4.3" };
+      }
 
-      SPRING_BOOT_CONFIG_FILE = System.getenv("SPRING_BOOT_CONFIG_FILE");
+      if (SPRING_BOOT_CONFIG_FILE == null) {
+         SPRING_BOOT_CONFIG_FILE = System.getenv("SPRING_BOOT_CONFIG_FILE");
+      }
    }
 
    @Inject
