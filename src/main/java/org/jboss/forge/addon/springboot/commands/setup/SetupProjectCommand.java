@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDelete;
 import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
@@ -55,7 +56,12 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
    private static String SPRING_BOOT_CONFIG_FILE;
    private static String SPRING_BOOT_DEFAULT_VERSION;
-   private static String[] SPRING_BOOT_VERSIONS;
+   private static List<String> SPRING_BOOT_VERSIONS;
+   private static final List<String> DEFAULT_SPRING_BOOT_VERSIONS = new ArrayList<>(3);
+
+   static {
+      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.3.8", "1.4.1", "1.4.3");
+   }
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
    private static final String STARTER_URL = "https://start.spring.io";
@@ -67,10 +73,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
          final String bootDefaultVersion = System.getenv("SPRING_BOOT_DEFAULT_VERSION");
          SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : "1.4.1";
       }
-      if (SPRING_BOOT_VERSIONS == null || SPRING_BOOT_VERSIONS.length == 0) {
+      if (SPRING_BOOT_VERSIONS == null || SPRING_BOOT_VERSIONS.isEmpty()) {
          final String bootVersions = System.getenv("SPRING_BOOT_VERSIONS");
-         SPRING_BOOT_VERSIONS = bootVersions != null ? splitVersions(bootVersions) :
-               new String[] { "1.3.8", "1.4.1", "1.4.3" };
+         SPRING_BOOT_VERSIONS = bootVersions != null ? splitVersions(bootVersions) : DEFAULT_SPRING_BOOT_VERSIONS;
       }
 
       if (SPRING_BOOT_CONFIG_FILE == null) {
@@ -91,16 +96,19 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
    private List<SpringBootDependencyDTO> choices;
 
-   public static String[] splitVersions(String s)
+   private static List<String> splitVersions(String s)
    {
-      return s.split(",");
+      return Arrays.stream(s.split(","))
+            .distinct()
+            .filter(element -> !element.isEmpty())
+            .collect(Collectors.toList());
    }
 
    @Override
    public void initializeUI(UIBuilder builder) throws Exception
    {
       UIOutput uiOutput = builder.getUIContext().getProvider().getOutput();
-      springBootVersion.setValueChoices(Arrays.asList(SPRING_BOOT_VERSIONS));
+      springBootVersion.setValueChoices(SPRING_BOOT_VERSIONS);
       springBootVersion.setDefaultValue(SPRING_BOOT_DEFAULT_VERSION);
 
       try
