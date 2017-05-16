@@ -6,13 +6,11 @@
  */
 package org.jboss.forge.addon.springboot.commands.ui;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import javax.inject.Inject;
-import javax.ws.rs.core.UriBuilder;
-
+import org.jboss.forge.addon.dependencies.Dependency;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -33,13 +31,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
+import javax.ws.rs.core.UriBuilder;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Creates a new REST Endpoint.
  *
  * @author <a href="cmoulliard@redhat.com">Charles Moulliard</a>
  */
-public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSource>
-{
+public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSource> {
+   private static final String SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
    @Inject
    @WithAttributes(label = "Methods", description = "REST methods to be defined", defaultValue = "GET")
    private UISelectMany<RestMethod> methods;
@@ -49,36 +51,39 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
    private UIInput<String> path;
 
    @Override
-   public UICommandMetadata getMetadata(UIContext context)
-   {
+   public UICommandMetadata getMetadata(UIContext context) {
       return Metadata.from(super.getMetadata(context), getClass())
-               .name(SPRING_REST_CAT + "New Endpoint")
-               .description("Creates a new Spring REST Endpoint");
+            .name(SPRING_REST_CAT + "New Endpoint")
+            .description("Creates a new Spring REST Endpoint");
    }
 
    @Override
-   protected String getType()
-   {
+   protected String getType() {
       return "REST";
    }
 
    @Override
-   protected Class<JavaClassSource> getSourceType()
-   {
+   protected Class<JavaClassSource> getSourceType() {
       return JavaClassSource.class;
    }
 
    @Override
-   public void initializeUI(UIBuilder builder) throws Exception
-   {
+   public void initializeUI(UIBuilder builder) throws Exception {
       super.initializeUI(builder);
       builder.add(methods).add(path);
    }
 
    @Override
    public JavaClassSource decorateSource(UIExecutionContext context, Project project, JavaClassSource source)
-            throws Exception
-   {
+         throws Exception {
+      // Check that we have the spring-boot-starter-web dependency and add it if we don't
+      final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
+      final Dependency springBootWebDep = DependencyBuilder.create()
+            .setArtifactId(SPRING_BOOT_STARTER_WEB)
+            .setGroupId("org.springframework.boot");
+      if (!dependencyFacet.hasEffectiveDependency(springBootWebDep)) {
+         dependencyFacet.addDirectDependency(springBootWebDep);
+      }
 
       // Create Java Classes Greeting and GreetingProperties
       JavaSourceFacet facet = project.getFacet(JavaSourceFacet.class);
@@ -92,8 +97,7 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
 
       StringBuilder sb = new StringBuilder();
 
-      if (path.hasValue())
-      {
+      if (path.hasValue()) {
          // Add contextPath within the application.properties file
          sb.append("server.contextPath=/" + path.getValue());
       }
@@ -107,30 +111,28 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
       source.addField().setPrivate().setFinal(false).setType("GreetingProperties").setName("properties").addAnnotation(Autowired.class);
       source.addField().setPrivate().setFinal(true).setType("AtomicLong").setName("counter").setLiteralInitializer("new AtomicLong()");
 
-      for (RestMethod method : methods.getValue())
-      {
+      for (RestMethod method : methods.getValue()) {
          MethodSource<?> greeting = source.addMethod()
-                                          .setPublic()
-                                          .setName(method.getMethodName())
-                                          .setReturnType("Greeting");
+               .setPublic()
+               .setName(method.getMethodName())
+               .setReturnType("Greeting");
 
-         switch (method)
-         {
-         case GET:
-            greeting.addAnnotation(RequestMapping.class).setStringValue("/greeting");
-            greeting.addParameter(String.class,"name").addAnnotation(RequestParam.class).setLiteralValue("value","\"name\"").setLiteralValue("defaultValue","\"world\"");
-            greeting.setBody("return new Greeting(this.counter.incrementAndGet(), String.format(this.properties.getMessage(), name));");
-            break;
-         case POST:
-            source.addImport(UriBuilder.class);
-            // TODO
-            break;
-         case PUT:
-            // TODO
-            break;
-         case DELETE:
-            // TODO
-            break;
+         switch (method) {
+            case GET:
+               greeting.addAnnotation(RequestMapping.class).setStringValue("/greeting");
+               greeting.addParameter(String.class, "name").addAnnotation(RequestParam.class).setLiteralValue("value", "\"name\"").setLiteralValue("defaultValue", "\"world\"");
+               greeting.setBody("return new Greeting(this.counter.incrementAndGet(), String.format(this.properties.getMessage(), name));");
+               break;
+            case POST:
+               source.addImport(UriBuilder.class);
+               // TODO
+               break;
+            case PUT:
+               // TODO
+               break;
+            case DELETE:
+               // TODO
+               break;
          }
       }
 
@@ -141,7 +143,7 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
       JavaClassSource source = Roaster.create(JavaClassSource.class).setName("GreetingProperties").setPackage(current.getPackage());
       source.addAnnotation(Component.class);
       source.addAnnotation(ConfigurationProperties.class).setStringValue("greeting");
-      source.addProperty(String.class,"message").getField().setStringInitializer("Hello, %s!");
+      source.addProperty(String.class, "message").getField().setStringInitializer("Hello, %s!");
       return source;
    }
 
@@ -149,8 +151,8 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
       JavaClassSource source = Roaster.create(JavaClassSource.class).setName("Greeting").setPackage(current.getPackage());
       source.addMethod().setPublic().setConstructor(true).setBody("this.id = 0;this.content = null;");
       source.addMethod().setPublic().setConstructor(true).setParameters("long id, String content").setBody("this.id = id; this.content = content;");
-      source.addProperty(String.class,"content");
-      source.addProperty("long","id");
+      source.addProperty(String.class, "content");
+      source.addProperty("long", "id");
       Roaster.format(source.toString());
       return source;
    }
