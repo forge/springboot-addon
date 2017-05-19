@@ -29,7 +29,7 @@
   <name>JBoss :: Forge Addon :: SpringBoot</name>
 
   <properties>
-    <forge.version>3.5.1.Final</forge.version>
+      <forge.version>3.6.2-SNAPSHOT</forge.version>
     <squareup.version>3.4.1</squareup.version>
     <jackson.version>2.8.6</jackson.version>
 
@@ -113,7 +113,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot</artifactId>
-      <version>1.4.1.RELEASE</version>
+        <version>1.5.3.RELEASE</version>
     </dependency>
 
     <!-- we use dtos with jackson annotations -->
