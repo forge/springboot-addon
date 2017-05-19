@@ -1,26 +1,23 @@
-/**
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at
  * http://www.eclipse.org/legal/epl-v10.html
+ *
  */
 package org.jboss.forge.addon.springboot.commands.ui;
 
 import org.jboss.forge.addon.dependencies.Dependency;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.javaee.rest.ui.RestMethod;
+import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
+import org.jboss.forge.addon.parser.java.ui.JavaSourceDecorator;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
-import org.jboss.forge.addon.ui.context.UIBuilder;
-import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
-import org.jboss.forge.addon.ui.input.UIInput;
-import org.jboss.forge.addon.ui.input.UISelectMany;
-import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
-import org.jboss.forge.addon.ui.metadata.WithAttributes;
-import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
@@ -31,51 +28,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Creates a new REST Endpoint.
+ * A {@link JavaSourceDecorator} that generates Spring-specific code when call from the {@code rest-new-endpoint}
+ * command.
  *
- * @author <a href="cmoulliard@redhat.com">Charles Moulliard</a>
+ * @author <a href="claprun@redhat.com>Christophe Laprun</a>
  */
-public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSource> {
-   private static final String SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
-   @Inject
-   @WithAttributes(label = "Methods", description = "REST methods to be defined", defaultValue = "GET")
-   private UISelectMany<RestMethod> methods;
+public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSource> {
+   public static final String SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
+   private final RestNewEndpointCommand wrapped;
 
-   @Inject
-   @WithAttributes(label = "Path", description = "The root path of the endpoint")
-   private UIInput<String> path;
+   public RestNewEndpointDecorator(RestNewEndpointCommand wrapped) {
+      this.wrapped = wrapped;
+   }
 
-   @Override
-   public UICommandMetadata getMetadata(UIContext context) {
-      return Metadata.from(super.getMetadata(context), getClass())
-            .name(SPRING_REST_CAT + "New Endpoint")
-            .description("Creates a new Spring REST Endpoint");
+   public static JavaClassSource createGreetingPropertiesClass(JavaClassSource current) {
+      JavaClassSource source = Roaster.create(JavaClassSource.class).setName("GreetingProperties").setPackage(current.getPackage());
+      source.addAnnotation(Component.class);
+      source.addAnnotation(ConfigurationProperties.class).setStringValue("greeting");
+      source.addProperty(String.class, "message").getField().setStringInitializer("Hello, %s!");
+      return source;
+   }
+
+   public static JavaClassSource createGreetingClass(JavaClassSource current) {
+      JavaClassSource source = Roaster.create(JavaClassSource.class).setName("Greeting").setPackage(current.getPackage());
+      source.addMethod().setPublic().setConstructor(true).setBody("this.id = 0;this.content = null;");
+      source.addMethod().setPublic().setConstructor(true).setParameters("long id, String content").setBody("this.id = id; this.content = content;");
+      source.addProperty(String.class, "content");
+      source.addProperty("long", "id");
+      Roaster.format(source.toString());
+      return source;
    }
 
    @Override
-   protected String getType() {
-      return "REST";
-   }
-
-   @Override
-   protected Class<JavaClassSource> getSourceType() {
-      return JavaClassSource.class;
-   }
-
-   @Override
-   public void initializeUI(UIBuilder builder) throws Exception {
-      super.initializeUI(builder);
-      builder.add(methods).add(path);
-   }
-
-   @Override
-   public JavaClassSource decorateSource(UIExecutionContext context, Project project, JavaClassSource source)
-         throws Exception {
+   public JavaClassSource decorateSource(UIExecutionContext context, Project project, JavaClassSource source) throws Exception {
       // Check that we have the spring-boot-starter-web dependency and add it if we don't
       final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
       final Dependency springBootWebDep = DependencyBuilder.create()
@@ -97,9 +86,9 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
 
       StringBuilder sb = new StringBuilder();
 
-      if (path.hasValue()) {
+      if (wrapped.getPath().hasValue()) {
          // Add contextPath within the application.properties file
-         sb.append("server.contextPath=/" + path.getValue());
+         sb.append("server.contextPath=/" + wrapped.getPath().getValue());
       }
       sb.append(System.getProperty("line.separator"));
       sb.append("greeting.message=Hello, %s!");
@@ -111,13 +100,13 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
       source.addField().setPrivate().setFinal(false).setType("GreetingProperties").setName("properties").addAnnotation(Autowired.class);
       source.addField().setPrivate().setFinal(true).setType("AtomicLong").setName("counter").setLiteralInitializer("new AtomicLong()");
 
-      for (RestMethod method : methods.getValue()) {
+      for (RestMethod restMethod : wrapped.getMethods().getValue()) {
          MethodSource<?> greeting = source.addMethod()
                .setPublic()
-               .setName(method.getMethodName())
+               .setName(restMethod.getMethodName())
                .setReturnType("Greeting");
 
-         switch (method) {
+         switch (restMethod) {
             case GET:
                greeting.addAnnotation(RequestMapping.class).setStringValue("/greeting");
                greeting.addParameter(String.class, "name").addAnnotation(RequestParam.class).setLiteralValue("value", "\"name\"").setLiteralValue("defaultValue", "\"world\"");
@@ -137,23 +126,7 @@ public class RestNewEndpointCommand extends AbstractRestNewCommand<JavaClassSour
       }
 
       return source;
+
    }
 
-   public JavaClassSource createGreetingPropertiesClass(JavaClassSource current) {
-      JavaClassSource source = Roaster.create(JavaClassSource.class).setName("GreetingProperties").setPackage(current.getPackage());
-      source.addAnnotation(Component.class);
-      source.addAnnotation(ConfigurationProperties.class).setStringValue("greeting");
-      source.addProperty(String.class, "message").getField().setStringInitializer("Hello, %s!");
-      return source;
-   }
-
-   public JavaClassSource createGreetingClass(JavaClassSource current) {
-      JavaClassSource source = Roaster.create(JavaClassSource.class).setName("Greeting").setPackage(current.getPackage());
-      source.addMethod().setPublic().setConstructor(true).setBody("this.id = 0;this.content = null;");
-      source.addMethod().setPublic().setConstructor(true).setParameters("long id, String content").setBody("this.id = id; this.content = content;");
-      source.addProperty(String.class, "content");
-      source.addProperty("long", "id");
-      Roaster.format(source.toString());
-      return source;
-   }
 }
