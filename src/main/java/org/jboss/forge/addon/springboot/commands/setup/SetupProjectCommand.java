@@ -6,10 +6,12 @@
  */
 package org.jboss.forge.addon.springboot.commands.setup;
 
+import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.rest.ClientFactory;
+import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
 import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -93,6 +95,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
    @Inject
    private ClientFactory factory;
+
+   @Inject
+   private FacetFactory facetFactory;
 
    private List<SpringBootDependencyDTO> choices;
 
@@ -198,6 +203,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
       {
          project = getSelectedProject(context.getUIContext());
       }
+
+      // install the SpringBootFacet
+      facetFactory.install(project, SpringBootFacet.class);
 
       MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
       String projectName = metadataFacet.getProjectName();
