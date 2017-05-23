@@ -5,7 +5,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package org.jboss.forge.addon.springboot.commands.setup;
+package org.jboss.forge.addon.springboot.commands;
 
 import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
 import org.jboss.forge.addon.parser.java.ui.AbstractJavaSourceCommand;
@@ -13,7 +13,6 @@ import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
-import org.jboss.forge.addon.springboot.commands.ui.JavaSourceCommandWrapper;
 import org.jboss.forge.addon.springboot.commands.ui.RestNewEndpointDecorator;
 import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.command.UICommandTransformer;

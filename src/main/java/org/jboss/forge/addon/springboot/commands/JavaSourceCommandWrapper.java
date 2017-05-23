@@ -5,7 +5,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package org.jboss.forge.addon.springboot.commands.ui;
+package org.jboss.forge.addon.springboot.commands;
 
 import org.jboss.forge.addon.parser.java.ui.AbstractJavaSourceCommand;
 import org.jboss.forge.addon.parser.java.ui.JavaSourceDecorator;
