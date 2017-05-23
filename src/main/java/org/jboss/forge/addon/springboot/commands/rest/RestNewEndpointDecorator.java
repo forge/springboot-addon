@@ -17,6 +17,7 @@ import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
+import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -38,7 +39,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author <a href="claprun@redhat.com>Christophe Laprun</a>
  */
 public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSource> {
-   public static final String SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
    private final RestNewEndpointCommand wrapped;
 
    public RestNewEndpointDecorator(RestNewEndpointCommand wrapped) {
@@ -68,8 +68,8 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
       // Check that we have the spring-boot-starter-web dependency and add it if we don't
       final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
       final Dependency springBootWebDep = DependencyBuilder.create()
-            .setArtifactId(SPRING_BOOT_STARTER_WEB)
-            .setGroupId("org.springframework.boot");
+            .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_WEB)
+            .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID);
       if (!dependencyFacet.hasEffectiveDependency(springBootWebDep)) {
          dependencyFacet.addDirectDependency(springBootWebDep);
       }
