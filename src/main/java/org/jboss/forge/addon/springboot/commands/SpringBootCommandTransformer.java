@@ -13,7 +13,7 @@ import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
-import org.jboss.forge.addon.springboot.commands.ui.RestNewEndpointDecorator;
+import org.jboss.forge.addon.springboot.commands.rest.RestNewEndpointDecorator;
 import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.command.UICommandTransformer;
 import org.jboss.forge.addon.ui.context.UIContext;
