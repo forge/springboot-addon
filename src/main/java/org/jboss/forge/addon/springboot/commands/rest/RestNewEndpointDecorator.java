@@ -7,17 +7,15 @@
  */
 package org.jboss.forge.addon.springboot.commands.rest;
 
-import org.jboss.forge.addon.dependencies.Dependency;
-import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.javaee.rest.ui.RestMethod;
 import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.parser.java.ui.JavaSourceDecorator;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
+import org.jboss.forge.addon.springboot.utils.DependencyHelper;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -66,13 +64,7 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
    @Override
    public JavaClassSource decorateSource(UIExecutionContext context, Project project, JavaClassSource source) throws Exception {
       // Check that we have the spring-boot-starter-web dependency and add it if we don't
-      final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
-      final Dependency springBootWebDep = DependencyBuilder.create()
-            .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_WEB)
-            .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID);
-      if (!dependencyFacet.hasEffectiveDependency(springBootWebDep)) {
-         dependencyFacet.addDirectDependency(springBootWebDep);
-      }
+      DependencyHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
 
       // Create Java Classes Greeting and GreetingProperties
       JavaSourceFacet facet = project.getFacet(JavaSourceFacet.class);
