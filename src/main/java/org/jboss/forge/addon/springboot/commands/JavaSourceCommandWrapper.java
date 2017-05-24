@@ -28,7 +28,16 @@ public class JavaSourceCommandWrapper implements UICommand {
    private final AbstractJavaSourceCommand<JavaClassSource> wrapped;
    private final JavaSourceDecorator<JavaClassSource> decorator;
 
-   public JavaSourceCommandWrapper(AbstractJavaSourceCommand<JavaClassSource> wrapped, JavaSourceDecorator<JavaClassSource> decorator) {
+   static JavaSourceCommandWrapper wrap(UICommand toWrap, JavaSourceDecorator<JavaClassSource> decorator) {
+      if (toWrap instanceof AbstractJavaSourceCommand) {
+         AbstractJavaSourceCommand wrapped = (AbstractJavaSourceCommand<JavaClassSource>) toWrap;
+         return new JavaSourceCommandWrapper(wrapped, decorator);
+      }
+      throw new IllegalArgumentException(toWrap + " is not a subclass of " + AbstractJavaSourceCommand.class);
+   }
+
+   private JavaSourceCommandWrapper(AbstractJavaSourceCommand<JavaClassSource> wrapped,
+                                    JavaSourceDecorator<JavaClassSource> decorator) {
       this.wrapped = wrapped;
       this.decorator = decorator;
    }

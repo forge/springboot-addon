@@ -8,7 +8,6 @@
 package org.jboss.forge.addon.springboot.commands;
 
 import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
-import org.jboss.forge.addon.parser.java.ui.AbstractJavaSourceCommand;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
@@ -17,7 +16,6 @@ import org.jboss.forge.addon.springboot.commands.rest.RestNewEndpointDecorator;
 import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.command.UICommandTransformer;
 import org.jboss.forge.addon.ui.context.UIContext;
-import org.jboss.forge.roaster.model.source.JavaClassSource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,8 +36,8 @@ public class SpringBootCommandTransformer implements UICommandTransformer {
       final Project project = Projects.getSelectedProject(factory, context);
       if (project != null && project.hasFacet(SpringBootFacet.class)) {
          if (original instanceof org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand) {
-            return new JavaSourceCommandWrapper((AbstractJavaSourceCommand<JavaClassSource>) original,
-                  new RestNewEndpointDecorator((RestNewEndpointCommand) original));
+            return JavaSourceCommandWrapper.wrap(original, new RestNewEndpointDecorator((RestNewEndpointCommand)
+                  original));
          }
       }
 
