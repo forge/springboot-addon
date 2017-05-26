@@ -15,7 +15,7 @@ import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
-import org.jboss.forge.addon.springboot.utils.DependencyHelper;
+import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -64,7 +64,7 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
    @Override
    public JavaClassSource decorateSource(UIExecutionContext context, Project project, JavaClassSource source) throws Exception {
       // Check that we have the spring-boot-starter-web dependency and add it if we don't
-      DependencyHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
+      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
 
       // Create Java Classes Greeting and GreetingProperties
       JavaSourceFacet facet = project.getFacet(JavaSourceFacet.class);

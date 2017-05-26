@@ -11,7 +11,7 @@ import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
-import org.jboss.forge.addon.springboot.utils.DependencyHelper;
+import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
@@ -36,7 +36,7 @@ public class AddJPADependencyCommand implements UICommand, UIWizardStep {
          throw new IllegalStateException("A project is required in the current context");
       }
 
-      DependencyHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA);
+      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA);
 
       return null;
    }

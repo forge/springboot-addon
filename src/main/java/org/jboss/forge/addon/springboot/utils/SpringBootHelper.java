@@ -6,15 +6,20 @@
  */
 package org.jboss.forge.addon.springboot.utils;
 
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
+import org.jboss.forge.addon.springboot.SpringBootFacet;
+
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SpringBootVersionHelper
+public class SpringBootHelper
 {
 
    public static String getVersion(String name)
    {
-      try (InputStream is = SpringBootVersionHelper.class
+      try (InputStream is = SpringBootHelper.class
                .getResourceAsStream("/META-INF/maven/org.jboss.forge.addon/spring-boot/pom.xml"))
       {
          String xml = IOHelper.loadText(is);
@@ -78,4 +83,19 @@ public class SpringBootVersionHelper
       return before(text, before);
    }
 
+   public static void addSpringBootDependency(Project project, String artifactId) {
+      addDependency(project, SpringBootFacet.SPRING_BOOT_GROUP_ID, artifactId);
+   }
+
+   public static DependencyBuilder addDependency(Project project, String groupId, String artifactId) {
+      final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
+      final DependencyBuilder dependency = DependencyBuilder.create()
+            .setArtifactId(artifactId)
+            .setGroupId(groupId);
+      if (!dependencyFacet.hasEffectiveDependency(dependency)) {
+         dependencyFacet.addDirectDependency(dependency);
+      }
+
+      return dependency;
+   }
 }
