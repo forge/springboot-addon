@@ -16,20 +16,17 @@ import org.jboss.forge.addon.springboot.SpringBootFacet;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SpringBootHelper
-{
+public class SpringBootHelper {
 
-   public static String getVersion(String name)
-   {
+   private final static String LINE_SEPARATOR = System.getProperty("line.separator");
+
+   public static String getVersion(String name) {
       try (InputStream is = SpringBootHelper.class
-               .getResourceAsStream("/META-INF/maven/org.jboss.forge.addon/spring-boot/pom.xml"))
-      {
+            .getResourceAsStream("/META-INF/maven/org.jboss.forge.addon/spring-boot/pom.xml")) {
          String xml = IOHelper.loadText(is);
          String version = between(xml, "<" + name + ">", "</" + name + ">");
          return version;
-      }
-      catch (IOException e)
-      {
+      } catch (IOException e) {
          // ignore
       }
       return "";
@@ -42,10 +39,8 @@ public class SpringBootHelper
     * @param after the token
     * @return the text after the token, or <tt>null</tt> if text does not contain the token
     */
-   public static String after(String text, String after)
-   {
-      if (!text.contains(after))
-      {
+   public static String after(String text, String after) {
+      if (!text.contains(after)) {
          return null;
       }
       return text.substring(text.indexOf(after) + after.length());
@@ -58,10 +53,8 @@ public class SpringBootHelper
     * @param before the token
     * @return the text before the token, or <tt>null</tt> if text does not contain the token
     */
-   public static String before(String text, String before)
-   {
-      if (!text.contains(before))
-      {
+   public static String before(String text, String before) {
+      if (!text.contains(before)) {
          return null;
       }
       return text.substring(0, text.indexOf(before));
@@ -75,11 +68,9 @@ public class SpringBootHelper
     * @param before the after token
     * @return the text between the tokens, or <tt>null</tt> if text does not contain the tokens
     */
-   public static String between(String text, String after, String before)
-   {
+   public static String between(String text, String after, String before) {
       text = after(text, after);
-      if (text == null)
-      {
+      if (text == null) {
          return null;
       }
       return before(text, before);
@@ -115,5 +106,30 @@ public class SpringBootHelper
       }
 
       return applicationFile;
+   }
+
+   public static void writeToApplicationProperties(Project project, CollectionStringBuffer lines) {
+      writeToApplicationProperties(project, false, lines);
+   }
+
+   public static void writeToApplicationProperties(Project project, boolean replace, CollectionStringBuffer lines) {
+      if (lines != null) {
+         final FileResource<?> applicationFile = getApplicationProperties(project);
+
+         final StringBuilder sb;
+         if (!replace) {
+            final String contents = applicationFile.getContents();
+            sb = new StringBuilder(contents.length() + lines.size());
+            sb.append(contents).append(LINE_SEPARATOR);
+         } else {
+            sb = new StringBuilder(lines.size());
+         }
+
+         lines.setSeparator(LINE_SEPARATOR);
+         sb.append(lines);
+
+
+         applicationFile.setContents(sb.toString());
+      }
    }
 }

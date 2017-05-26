@@ -12,8 +12,8 @@ import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.parser.java.ui.JavaSourceDecorator;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
+import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.roaster.Roaster;
@@ -70,17 +70,13 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
       facet.saveJavaSource(createGreetingClass(source));
       facet.saveJavaSource(createGreetingPropertiesClass(source));
 
-      FileResource<?> applicationFile = SpringBootHelper.getApplicationProperties(project);
-
-      StringBuilder sb = new StringBuilder();
-
+      final CollectionStringBuffer lines = new CollectionStringBuffer();
       if (wrapped.getPath().hasValue()) {
-         // Add contextPath within the application.properties file
-         sb.append("server.contextPath=/" + wrapped.getPath().getValue());
+         final String value = wrapped.getPath().getValue();
+         lines.append("server.contextPath=" + (value.startsWith("/") ? value : "/" + value));
       }
-      sb.append(System.getProperty("line.separator"));
-      sb.append("greeting.message=Hello, %s!");
-      applicationFile.setContents(sb.toString());
+      lines.append("greeting.message=Hello, %s!");
+      SpringBootHelper.writeToApplicationProperties(project, lines);
 
       // Create the Controller
       source.addImport(AtomicLong.class);
