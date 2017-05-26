@@ -9,6 +9,8 @@ package org.jboss.forge.addon.springboot.utils;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
+import org.jboss.forge.addon.projects.facets.ResourcesFacet;
+import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 
 import java.io.IOException;
@@ -97,5 +99,21 @@ public class SpringBootHelper
       }
 
       return dependency;
+   }
+
+   /**
+    * Returns (and creates if needed) the `application.properties` file associated with the specified project.
+    *
+    * @param project the {@link Project} for which we want to retrieve the application properties
+    * @return the `application.properties` file associated with the specified project, creating it if it doesn't
+    * already exists.
+    */
+   public static FileResource<?> getApplicationProperties(Project project) {
+      FileResource<?> applicationFile = project.getFacet(ResourcesFacet.class).getResource("application.properties");
+      if (!applicationFile.exists()) {
+         applicationFile.createNewFile();
+      }
+
+      return applicationFile;
    }
 }

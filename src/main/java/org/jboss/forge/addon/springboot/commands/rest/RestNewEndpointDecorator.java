@@ -12,7 +12,6 @@ import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.parser.java.ui.JavaSourceDecorator;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
@@ -71,10 +70,7 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
       facet.saveJavaSource(createGreetingClass(source));
       facet.saveJavaSource(createGreetingPropertiesClass(source));
 
-      FileResource<?> applicationFile = project.getFacet(ResourcesFacet.class).getResource("application.properties");
-      if (!applicationFile.exists()) {
-         applicationFile.createNewFile();
-      }
+      FileResource<?> applicationFile = SpringBootHelper.getApplicationProperties(project);
 
       StringBuilder sb = new StringBuilder();
 
