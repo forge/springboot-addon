@@ -6,58 +6,53 @@
  */
 package org.jboss.forge.addon.springboot.utils;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * A little helper class for converting a collection of values to a (usually comma separated) string.
  */
-public class CollectionStringBuffer
-{
+public class CollectionStringBuffer {
 
-   private final StringBuilder buffer = new StringBuilder();
+   private final List<Object> buffer = new LinkedList<>();
    private String separator;
-   private boolean first = true;
 
-   public CollectionStringBuffer()
-   {
+   public CollectionStringBuffer() {
       this(", ");
    }
 
-   public CollectionStringBuffer(String separator)
-   {
+   public CollectionStringBuffer(String separator) {
       this.separator = separator;
    }
 
    @Override
-   public String toString()
-   {
-      return buffer.toString();
+   public String toString() {
+      return buffer.stream()
+            .filter(Objects::nonNull)
+            .map(Object::toString)
+            .collect(Collectors.joining(separator));
    }
 
-   public void append(Object value)
-   {
-      if (first)
-      {
-         first = false;
-      }
-      else
-      {
-         buffer.append(separator);
-      }
-      buffer.append(value);
+   public void append(Object value) {
+      buffer.add(value);
    }
 
-   public String getSeparator()
-   {
+   public String getSeparator() {
       return separator;
    }
 
-   public void setSeparator(String separator)
-   {
+   public void setSeparator(String separator) {
       this.separator = separator;
    }
 
-   public boolean isEmpty()
-   {
-      return first;
+   public boolean isEmpty() {
+      return buffer.isEmpty();
+   }
+
+   public int size() {
+      return buffer.size() * 100;
    }
 
 }
