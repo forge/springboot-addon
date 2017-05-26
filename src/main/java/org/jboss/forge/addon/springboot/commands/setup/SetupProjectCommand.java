@@ -62,7 +62,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    private static final List<String> DEFAULT_SPRING_BOOT_VERSIONS = new ArrayList<>(3);
 
    static {
-      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.3.8", "1.4.1", "1.4.3");
+      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.3.8", "1.4.1", "1.4.3", "1.5.3");
    }
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
@@ -73,7 +73,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    {
       if (SPRING_BOOT_DEFAULT_VERSION == null) {
          final String bootDefaultVersion = System.getenv("SPRING_BOOT_DEFAULT_VERSION");
-         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : "1.4.1";
+         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : "1.5.3";
       }
       if (SPRING_BOOT_VERSIONS == null || SPRING_BOOT_VERSIONS.isEmpty()) {
          final String bootVersions = System.getenv("SPRING_BOOT_VERSIONS");
