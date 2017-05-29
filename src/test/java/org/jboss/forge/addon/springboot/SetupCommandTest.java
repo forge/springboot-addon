@@ -6,9 +6,6 @@
  */
 package org.jboss.forge.addon.springboot;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.jboss.arquillian.junit.Arquillian;
@@ -28,6 +25,9 @@ import org.jboss.forge.parser.xml.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -122,7 +122,7 @@ public class SetupCommandTest {
 		}
 		else {
 			controller.getValueFor("springBootVersion");
-			assertEquals("1.4.1", controller.getValueFor("springBootVersion"));
+			assertEquals("1.5.3", controller.getValueFor("springBootVersion"));
 		}
 	}
 
