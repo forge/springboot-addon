@@ -66,9 +66,15 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
-      <artifactId>scaffold</artifactId>
-      <classifier>forge-addon</classifier>
+        <artifactId>javaee-impl</artifactId>
+        <version>${forge.version}</version>
+        <scope>provided</scope>
     </dependency>
+      <dependency>
+          <groupId>org.jboss.forge.addon</groupId>
+          <artifactId>scaffold</artifactId>
+          <classifier>forge-addon</classifier>
+      </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>ui</artifactId>
