@@ -12,8 +12,6 @@ import org.jboss.forge.addon.javaee.jpa.DatabaseType;
 import org.jboss.forge.addon.javaee.jpa.JPADataSource;
 import org.jboss.forge.addon.javaee.jpa.JPAFacet;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.ProjectFactory;
-import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.command.UICommand;
@@ -33,15 +31,12 @@ import static org.jboss.forge.addon.javaee.jpa.DatabaseType.*;
  */
 public class AddDBJarDependencyCommand implements UICommand, UIWizardStep {
    @Inject
-   private ProjectFactory factory;
+   private SpringBootHelper helper;
 
    @Override
    public Result execute(UIExecutionContext context) throws Exception {
       final UIContext uiContext = context.getUIContext();
-      final Project project = Projects.getSelectedProject(factory, uiContext);
-      if (project == null) {
-         throw new IllegalStateException("A project is required in the current context");
-      }
+      final Project project = helper.getProject(uiContext);
 
       final Map<Object, Object> attributeMap = uiContext.getAttributeMap();
       final JPADataSource dataSource = (JPADataSource) attributeMap.get(JPADataSource.class);

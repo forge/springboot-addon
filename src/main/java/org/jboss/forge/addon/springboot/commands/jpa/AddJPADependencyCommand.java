@@ -8,8 +8,6 @@
 package org.jboss.forge.addon.springboot.commands.jpa;
 
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.ProjectFactory;
-import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.command.UICommand;
@@ -25,16 +23,13 @@ import javax.inject.Inject;
  */
 public class AddJPADependencyCommand implements UICommand, UIWizardStep {
    @Inject
-   private ProjectFactory factory;
+   private SpringBootHelper helper;
 
    @Override
    public Result execute(UIExecutionContext context) throws Exception {
       // Check that we have the spring-boot-starter-web dependency and add it if we don't
       final UIContext uiContext = context.getUIContext();
-      final Project project = Projects.getSelectedProject(factory, uiContext);
-      if (project == null) {
-         throw new IllegalStateException("A project is required in the current context");
-      }
+      final Project project = helper.getProject(uiContext);
 
       SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA);
 

@@ -8,17 +8,25 @@ package org.jboss.forge.addon.springboot.utils;
 
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFactory;
+import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
+import org.jboss.forge.addon.ui.context.UIContext;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class SpringBootHelper {
 
    private final static String LINE_SEPARATOR = System.getProperty("line.separator");
+
+   @Inject
+   private ProjectFactory projectFactory;
+
 
    public static String getVersion(String name) {
       try (InputStream is = SpringBootHelper.class
@@ -131,5 +139,14 @@ public class SpringBootHelper {
 
          applicationFile.setContents(sb.toString());
       }
+   }
+
+   public Project getProject(UIContext uiContext) {
+      final Project project = Projects.getSelectedProject(projectFactory, uiContext);
+      if (project == null) {
+         throw new IllegalStateException("A project is required in the current context");
+      }
+
+      return project;
    }
 }
