@@ -7,13 +7,16 @@
 package org.jboss.forge.addon.springboot.utils;
 
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
+import org.jboss.forge.addon.projects.dependencies.DependencyInstaller;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
+import org.jboss.forge.addon.springboot.commands.jpa.SpringBootJPAFacet;
 import org.jboss.forge.addon.ui.context.UIContext;
 
 import javax.inject.Inject;
@@ -26,6 +29,12 @@ public class SpringBootHelper {
 
    @Inject
    private ProjectFactory projectFactory;
+
+   @Inject
+   private FacetFactory facetFactory;
+
+   @Inject
+   private DependencyInstaller installer;
 
 
    public static String getVersion(String name) {
@@ -148,5 +157,11 @@ public class SpringBootHelper {
       }
 
       return project;
+   }
+
+   public SpringBootJPAFacet installJPAFacet(Project project) {
+      final SpringBootJPAFacet facet = new SpringBootJPAFacet(installer);
+      facetFactory.install(project, facet);
+      return facet;
    }
 }
