@@ -93,8 +93,8 @@ public class SpringBootHelper {
       return before(text, before);
    }
 
-   public static void addSpringBootDependency(Project project, String artifactId) {
-      addDependency(project, SpringBootFacet.SPRING_BOOT_GROUP_ID, artifactId);
+   public static DependencyBuilder addSpringBootDependency(Project project, String artifactId) {
+      return addDependency(project, SpringBootFacet.SPRING_BOOT_GROUP_ID, artifactId);
    }
 
    public static DependencyBuilder addDependency(Project project, String groupId, String artifactId) {
@@ -102,9 +102,7 @@ public class SpringBootHelper {
       final DependencyBuilder dependency = DependencyBuilder.create()
             .setArtifactId(artifactId)
             .setGroupId(groupId);
-      if (!dependencyFacet.hasEffectiveDependency(dependency)) {
-         dependencyFacet.addDirectDependency(dependency);
-      }
+      dependencyFacet.addDirectDependency(dependency);
 
       return dependency;
    }
@@ -117,8 +115,12 @@ public class SpringBootHelper {
     * already exists.
     */
    public static FileResource<?> getApplicationProperties(Project project) {
+      return getApplicationProperties(project, true);
+   }
+
+   public static FileResource<?> getApplicationProperties(Project project, boolean create) {
       FileResource<?> applicationFile = project.getFacet(ResourcesFacet.class).getResource("application.properties");
-      if (!applicationFile.exists()) {
+      if (create && !applicationFile.exists()) {
          applicationFile.createNewFile();
       }
 
@@ -161,7 +163,10 @@ public class SpringBootHelper {
 
    public SpringBootJPAFacet installJPAFacet(Project project) {
       final SpringBootJPAFacet facet = new SpringBootJPAFacet(installer);
-      facetFactory.install(project, facet);
+      final boolean installed = facetFactory.install(project, facet);
+      if (!installed) {
+         throw new RuntimeException("SpringBoot JPA Facet didn't get installed");
+      }
       return facet;
    }
 }

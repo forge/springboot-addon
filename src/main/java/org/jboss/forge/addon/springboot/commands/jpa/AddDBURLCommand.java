@@ -8,17 +8,12 @@
 package org.jboss.forge.addon.springboot.commands.jpa;
 
 import org.jboss.forge.addon.javaee.jpa.DatabaseType;
-import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.javaee.jpa.JPADataSource;
 import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
-import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
-import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
-import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.hints.InputType;
 import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
-import org.jboss.forge.addon.ui.result.Result;
-import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -26,9 +21,9 @@ import java.util.Map;
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
  */
-public class AddDBURLCommand implements UICommand, UIWizardStep {
+public class AddDBURLCommand extends AbstractDataSourceCommand {
    @Inject
-   @WithAttributes(label = "Database URL")
+   @WithAttributes(label = "Database URL", required = true)
    private UIInput<String> databaseURL;
 
    @Inject
@@ -36,12 +31,8 @@ public class AddDBURLCommand implements UICommand, UIWizardStep {
    private UIInput<String> username;
 
    @Inject
-   @WithAttributes(label = "Password", type = InputType.SECRET)
+   @WithAttributes(label = "Password", type = InputType.SECRET, required = true)
    private UIInput<String> password;
-
-   @Inject
-   private SpringBootHelper helper;
-
 
    @Override
    public void initializeUI(UIBuilder builder) throws Exception {
@@ -52,15 +43,13 @@ public class AddDBURLCommand implements UICommand, UIWizardStep {
    }
 
    @Override
-   public Result execute(UIExecutionContext context) throws Exception {
-      final CollectionStringBuffer buffer = new CollectionStringBuffer();
+   protected void updateDataSource(JPADataSource dataSource) {
+      dataSource.setDatabaseURL(databaseURL.getValue()).setUsername(username.getValue()).setPassword(password.getValue());
+   }
 
+   protected void setProperties(CollectionStringBuffer buffer) {
       buffer.append("spring.datasource.url=" + databaseURL.getValue());
       buffer.append("spring.datasource.username=" + username.getValue());
       buffer.append("spring.datasource.password=" + password.getValue());
-
-      final Project project = helper.getProject(context.getUIContext());
-      SpringBootHelper.writeToApplicationProperties(project, buffer);
-      return null;
    }
 }

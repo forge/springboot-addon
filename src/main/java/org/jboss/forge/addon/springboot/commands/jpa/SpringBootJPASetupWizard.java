@@ -9,16 +9,14 @@ package org.jboss.forge.addon.springboot.commands.jpa;
 
 import org.jboss.forge.addon.dependencies.Coordinate;
 import org.jboss.forge.addon.facets.constraints.FacetConstraint;
-import org.jboss.forge.addon.javaee.jpa.DatabaseType;
-import org.jboss.forge.addon.javaee.jpa.JPAFacet;
-import org.jboss.forge.addon.javaee.jpa.PersistenceContainer;
-import org.jboss.forge.addon.javaee.jpa.PersistenceProvider;
+import org.jboss.forge.addon.javaee.jpa.*;
 import org.jboss.forge.addon.javaee.jpa.providers.HibernateProvider;
 import org.jboss.forge.addon.javaee.jpa.ui.setup.JPASetupWizard;
 import org.jboss.forge.addon.javaee.ui.AbstractJavaEECommand;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.stacks.annotations.StackConstraint;
+import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.context.*;
 import org.jboss.forge.addon.ui.input.UIInput;
@@ -49,10 +47,6 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
    @Inject
    @WithAttributes(label = "Use JNDI datasource?", required = true, defaultValue = "false")
    private UIInput<Boolean> useJNDI;
-   
-   /*@Inject
-   @WithAttributes(shortName = 'c', label = "Container", required = true)
-   private UISelectOne<PersistenceContainer> jpaContainer;*/
 
    @Inject
    @WithAttributes(shortName = 'p', label = "Provider", required = true)
@@ -73,33 +67,12 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
 
    @Override
    public void initializeUI(UIBuilder builder) throws Exception {
-//      UIContext uiContext = builder.getUIContext();
-//      Project project = getSelectedProject(builder);
-
       dbType.setDefaultValue(H2);
       builder.add(dbType).add(useJNDI);
 
-//      initContainers(project, uiContext);
       initProviders();
       builder.add(jpaProvider);
    }
-
-   /*private void initContainers(Project project, UIContext context) {
-      final boolean isGUI = context.getProvider().isGUI();
-      jpaContainer.setItemLabelConverter((source) -> source.getName(isGUI));
-      // Ordering items
-      TreeSet<PersistenceContainer> treeSet = new TreeSet<>(
-            (o1, o2) -> String.valueOf(o1.getName(isGUI)).compareTo(o2.getName(isGUI)));
-      Optional<Stack> stack = project.getStack();
-      for (PersistenceContainer persistenceContainer : jpaContainer.getValueChoices()) {
-         if (!stack.isPresent() || persistenceContainer.supports(stack.get()))
-            treeSet.add(persistenceContainer);
-      }
-      jpaContainer.setValueChoices(treeSet);
-      if (treeSet.contains(defaultContainer)) {
-         jpaContainer.setDefaultValue(defaultContainer);
-      }
-   }*/
 
    private void initProviders() {
       jpaProvider.setItemLabelConverter(PersistenceProvider::getName);
@@ -118,63 +91,20 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
 
    @Override
    public Result execute(final UIExecutionContext context) throws Exception {
-      applyUIValues(context.getUIContext());
-
-      final DatabaseType database = dbType.getValue();
-      final Coordinate driverCoordinate = database.getDriverCoordinate();
-
-      final Project project = helper.getProject(context.getUIContext());
+      final UIContext uiContext = context.getUIContext();
+      applyUIValues(uiContext);
 
       // add driver dependency
+      final Project project = helper.getProject(uiContext);
+      final DatabaseType database = dbType.getValue();
+      final Coordinate driverCoordinate = database.getDriverCoordinate();
       SpringBootHelper.addDependency(project, driverCoordinate.getGroupId(), driverCoordinate.getArtifactId())
             .setScopeType("runtime");
-
+      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA)
+            .setScopeType("runtime");
 
       return Results.success("Spring Boot JPA successfully set up!");
    }
-
-/*   private PersistenceProvider wrapPersistenceProvider(Map<Object, Object> attributeMap) {
-      final PersistenceProvider provider = jpaProvider.getValue();
-      final PersistenceProvider wrapped = new PersistenceProvider() {
-         @Override
-         public String getName() {
-            return provider.getName();
-         }
-
-         @Override
-         public String getProvider() {
-            return provider.getProvider();
-         }
-
-         @Override
-         public PersistenceUnitCommon configure(PersistenceUnitCommon unit, JPADataSource ds, Project project) {
-            return provider.configure(unit, ds, project);
-         }
-
-         @Override
-         public List<Dependency> listDependencies() {
-            return provider.listDependencies();
-         }
-
-         @Override
-         public MetaModelProvider getMetaModelProvider() {
-            return provider.getMetaModelProvider();
-         }
-
-         @Override
-         public void validate(JPADataSource dataSource) throws Exception {
-            // put data source in attribute map so that it can be used in other commands
-            attributeMap.put(JPADataSource.class, dataSource);
-
-            provider.validate(dataSource);
-         }
-      };
-
-      // replace original provider by wrapped version
-      attributeMap.put(PersistenceProvider.class, wrapped);
-
-      return wrapped;
-   }*/
 
    @Override
    public NavigationResult next(UINavigationContext context) throws Exception {
@@ -198,12 +128,19 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       Map<Object, Object> attributeMap = context.getAttributeMap();
 
       final Project project = helper.getProject(context);
-      final SpringBootJPAFacet jpaFacet = helper.installJPAFacet(project);
+      helper.installJPAFacet(project);
 
-      attributeMap.put(JPAFacet.class, jpaFacet);
-      attributeMap.put(PersistenceContainer.class, new SpringBootPersistenceContainer());
-      attributeMap.put(DatabaseType.class, dbType.getValue());
-//      wrapPersistenceProvider(attributeMap);
+      final SpringBootPersistenceContainer container = new SpringBootPersistenceContainer();
+      attributeMap.put(PersistenceContainer.class, container);
+      final PersistenceProvider provider = jpaProvider.getValue();
+      attributeMap.put(PersistenceProvider.class, provider);
+      final DatabaseType database = dbType.getValue();
+      attributeMap.put(DatabaseType.class, database);
+      final JPADataSource dataSource = new JPADataSource();
+      dataSource.setDatabase(database);
+      dataSource.setContainer(container);
+      dataSource.setProvider(provider);
+      attributeMap.put(JPADataSource.class, dataSource);
    }
 
    @Override
