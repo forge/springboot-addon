@@ -36,6 +36,7 @@ import java.util.Map;
  */
 public class SpringBootJPAFacet extends AbstractJPAFacetImpl<PersistenceDescriptor> {
    private final static PersistenceDescriptor DESCRIPTOR = new SpringBootPersistenceDescriptor();
+   private static final String NATIVE_PROPERTIES_PREFIX = "spring.jpa.properties.";
    private final Dependency SPRING_BOOT_DATA_JPA = DependencyBuilder.create()
          .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID)
          .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA)
@@ -79,7 +80,7 @@ public class SpringBootJPAFacet extends AbstractJPAFacetImpl<PersistenceDescript
       final Properties<PersistenceUnit<PersistenceDescriptor>> properties = DESCRIPTOR.getOrCreatePersistenceUnit().getOrCreateProperties();
       final List<Property<Properties<PersistenceUnit<PersistenceDescriptor>>>> propertyList = properties.getAllProperty();
       for (Property<Properties<PersistenceUnit<PersistenceDescriptor>>> property : propertyList) {
-         buffer.append("spring.jpa." + property.getName() + "=" + property.getValue());
+         buffer.append(NATIVE_PROPERTIES_PREFIX + property.getName() + "=" + property.getValue());
       }
 
       SpringBootHelper.writeToApplicationProperties(getFaceted(), buffer);
