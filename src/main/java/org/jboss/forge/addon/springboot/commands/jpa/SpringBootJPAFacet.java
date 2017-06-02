@@ -25,6 +25,7 @@ import org.jboss.shrinkwrap.descriptor.api.persistence21.Property;
 import org.jboss.shrinkwrap.descriptor.impl.persistence21.PersistenceUnitImpl;
 import org.jboss.shrinkwrap.descriptor.spi.node.Node;
 
+import javax.inject.Inject;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,13 +44,15 @@ public class SpringBootJPAFacet extends AbstractJPAFacetImpl<PersistenceDescript
          .setScopeType("provided");
    final static String PERSISTENCE_UNIT_NAME = "spring-boot-pu";
 
+   @Inject
    public SpringBootJPAFacet(DependencyInstaller installer) {
       super(installer);
    }
 
    @Override
    public FileResource<?> getConfigFile() {
-      // use application.properties instead of persistence.xml
+      // use application.properties instead of persistence.xml but do not create it to work correctly with
+      // AbstractJPAFacetImpl.install
       return SpringBootHelper.getApplicationProperties(getFaceted(), false);
    }
 
@@ -70,7 +73,8 @@ public class SpringBootJPAFacet extends AbstractJPAFacetImpl<PersistenceDescript
 
    @Override
    protected void createDefaultConfig(FileResource<?> descriptor) {
-      // do nothing
+      // create application.properties to respect AbstractJPAFacetImpl.install behavior
+      SpringBootHelper.getApplicationProperties(getFaceted(), true);
    }
 
    @Override

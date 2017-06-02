@@ -11,7 +11,6 @@ import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
-import org.jboss.forge.addon.projects.dependencies.DependencyInstaller;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.FileResource;
@@ -34,8 +33,7 @@ public class SpringBootHelper {
    private FacetFactory facetFactory;
 
    @Inject
-   private DependencyInstaller installer;
-
+   private SpringBootJPAFacet jpaFacet;
 
    public static String getVersion(String name) {
       try (InputStream is = SpringBootHelper.class
@@ -162,11 +160,10 @@ public class SpringBootHelper {
    }
 
    public SpringBootJPAFacet installJPAFacet(Project project) {
-      final SpringBootJPAFacet facet = new SpringBootJPAFacet(installer);
-      final boolean installed = facetFactory.install(project, facet);
+      final boolean installed = facetFactory.install(project, jpaFacet);
       if (!installed) {
          throw new RuntimeException("SpringBoot JPA Facet didn't get installed");
       }
-      return facet;
+      return jpaFacet;
    }
 }
