@@ -29,6 +29,7 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 import org.springframework.boot.jdbc.DatabaseDriver;
 
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import static org.jboss.forge.addon.javaee.jpa.DatabaseType.*;
  */
 @FacetConstraint(JavaSourceFacet.class)
 @StackConstraint(JPAFacet.class)
+@Alternative
 public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements JPASetupWizard {
    @Inject
    @WithAttributes(shortName = 't', label = "Database Type", required = true)
