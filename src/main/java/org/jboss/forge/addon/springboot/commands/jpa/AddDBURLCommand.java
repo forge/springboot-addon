@@ -7,7 +7,6 @@
  */
 package org.jboss.forge.addon.springboot.commands.jpa;
 
-import org.jboss.forge.addon.javaee.jpa.DatabaseType;
 import org.jboss.forge.addon.javaee.jpa.JPADataSource;
 import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -16,16 +15,11 @@ import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
  */
 public class AddDBURLCommand extends AbstractDataSourceCommand {
-   @Inject
-   @WithAttributes(label = "Database URL", required = true)
-   private UIInput<String> databaseURL;
-
    @Inject
    @WithAttributes(label = "Username", required = true)
    private UIInput<String> username;
@@ -36,19 +30,16 @@ public class AddDBURLCommand extends AbstractDataSourceCommand {
 
    @Override
    public void initializeUI(UIBuilder builder) throws Exception {
-      Map<Object, Object> attributeMap = builder.getUIContext().getAttributeMap();
-      final DatabaseType database = (DatabaseType) attributeMap.get(DatabaseType.class);
-      databaseURL.setDefaultValue("jdbc:" + database.name() + ":myDB");
-      builder.add(databaseURL).add(username).add(password);
+      builder.add(username).add(password);
    }
 
    @Override
    protected void updateDataSource(JPADataSource dataSource) {
-      dataSource.setDatabaseURL(databaseURL.getValue()).setUsername(username.getValue()).setPassword(password.getValue());
+      dataSource.setUsername(username.getValue()).setPassword(password.getValue());
    }
 
-   protected void setProperties(CollectionStringBuffer buffer) {
-      buffer.append("spring.datasource.url=" + databaseURL.getValue());
+   protected void setProperties(CollectionStringBuffer buffer, JPADataSource dataSource) {
+      buffer.append("spring.datasource.url=" + dataSource.getDatabaseURL());
       buffer.append("spring.datasource.username=" + username.getValue());
       buffer.append("spring.datasource.password=" + password.getValue());
    }

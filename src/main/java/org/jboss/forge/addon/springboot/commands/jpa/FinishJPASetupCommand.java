@@ -15,7 +15,6 @@ import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.result.Result;
-import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 import javax.inject.Inject;
@@ -40,6 +39,6 @@ public class FinishJPASetupCommand implements UICommand, UIWizardStep {
       final JPADataSource dataSource = (JPADataSource) attributeMap.get(JPADataSource.class);
 
       persistenceOperations.setup(SpringBootJPAFacet.PERSISTENCE_UNIT_NAME, project, dataSource, false);
-      return Results.success("Persistence (JPA) is installed.");
+      return null;
    }
 }

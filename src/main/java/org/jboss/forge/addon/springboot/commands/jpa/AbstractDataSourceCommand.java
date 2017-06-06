@@ -31,17 +31,15 @@ public abstract class AbstractDataSourceCommand implements UICommand, UIWizardSt
 
    @Override
    public Result execute(UIExecutionContext context) throws Exception {
-
-      final CollectionStringBuffer buffer = new CollectionStringBuffer();
-
-      setProperties(buffer);
-
       final UIContext uiContext = context.getUIContext();
-      final Project project = helper.getProject(uiContext);
-      SpringBootHelper.writeToApplicationProperties(project, buffer);
-
       JPADataSource dataSource = (JPADataSource) uiContext.getAttributeMap().get(JPADataSource.class);
       updateDataSource(dataSource);
+
+      final CollectionStringBuffer buffer = new CollectionStringBuffer();
+      setProperties(buffer, dataSource);
+
+      final Project project = helper.getProject(uiContext);
+      SpringBootHelper.writeToApplicationProperties(project, buffer);
 
       return null;
    }
@@ -53,5 +51,5 @@ public abstract class AbstractDataSourceCommand implements UICommand, UIWizardSt
 
    protected abstract void updateDataSource(JPADataSource dataSource);
 
-   protected abstract void setProperties(CollectionStringBuffer buffer);
+   protected abstract void setProperties(CollectionStringBuffer buffer, JPADataSource dataSource);
 }

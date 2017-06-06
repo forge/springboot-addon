@@ -45,8 +45,12 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
    private UISelectOne<DatabaseType> dbType;
 
    @Inject
-   @WithAttributes(label = "Use JNDI datasource?", required = true, defaultValue = "false")
-   private UIInput<Boolean> useJNDI;
+   @WithAttributes(shortName = 'd', label = "DataSource Name")
+   private UIInput<String> dataSourceName;
+
+   @Inject
+   @WithAttributes(shortName = 'u', label = "Database URL")
+   private UIInput<String> databaseURL;
 
    @Inject
    @WithAttributes(shortName = 'p', label = "Provider", required = true)
@@ -68,7 +72,7 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
    @Override
    public void initializeUI(UIBuilder builder) throws Exception {
       dbType.setDefaultValue(H2);
-      builder.add(dbType).add(useJNDI);
+      builder.add(dbType).add(databaseURL).add(dataSourceName);
 
       initProviders();
       builder.add(jpaProvider);
@@ -86,6 +90,11 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       if (driver.equals(DatabaseDriver.UNKNOWN)) {
          // Spring Boot doesn't know about this DB
          validator.addValidationError(dbType, "Spring Boot doesn't know about DB '" + dbType.getName() + "'");
+      }
+
+      if (!isEmbeddedDB(database) && !databaseURL.hasValue() && !dataSourceName.hasValue()) {
+         validator.addValidationError(dataSourceName, "Either DataSource name or database URL is required");
+         validator.addValidationError(databaseURL, "Either DataSource name or database URL is required");
       }
    }
 
@@ -111,20 +120,25 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       applyUIValues(context.getUIContext());
 
       final DatabaseType database = dbType.getValue();
-      if (database.equals(H2) || database.equals(DERBY) || database.equals(HSQLDB)) {
+      if (isEmbeddedDB(database)) {
          // if we're using H2, Derby or HSQL embedded databases, we're done!
          return null;
       } else {
-         // redirect to appropriate next step depending on whether we want to use a JNDI data source or not
-         if (useJNDI.getValue()) {
+         if (dataSourceName.hasValue()) {
+            // if we specified a datasource, use it
             return Results.navigateTo(AddJNDIDatasourceCommand.class);
          } else {
+            // otherwise, we're using the DB URL, so deal with it
             return Results.navigateTo(AddDBURLCommand.class);
          }
       }
    }
 
-   private void applyUIValues(final UIContext context) {
+   private boolean isEmbeddedDB(DatabaseType database) {
+      return database.equals(H2) || database.equals(DERBY) || database.equals(HSQLDB);
+   }
+
+   private JPADataSource applyUIValues(final UIContext context) {
       Map<Object, Object> attributeMap = context.getAttributeMap();
 
       final Project project = helper.getProject(context);
@@ -140,7 +154,11 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       dataSource.setDatabase(database);
       dataSource.setContainer(container);
       dataSource.setProvider(provider);
+      dataSource.setJndiDataSource(dataSourceName.getValue());
+      dataSource.setDatabaseURL(databaseURL.getValue());
       attributeMap.put(JPADataSource.class, dataSource);
+
+      return dataSource;
    }
 
    @Override
