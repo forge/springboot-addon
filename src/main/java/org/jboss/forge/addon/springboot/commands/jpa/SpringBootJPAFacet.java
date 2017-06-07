@@ -13,7 +13,6 @@ import org.jboss.forge.addon.javaee.jpa.AbstractJPAFacetImpl;
 import org.jboss.forge.addon.projects.dependencies.DependencyInstaller;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
-import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.furnace.versions.SingleVersion;
 import org.jboss.forge.furnace.versions.Version;
@@ -38,6 +37,7 @@ import java.util.Map;
 public class SpringBootJPAFacet extends AbstractJPAFacetImpl<PersistenceDescriptor> {
    private final static PersistenceDescriptor DESCRIPTOR = new SpringBootPersistenceDescriptor();
    private static final String NATIVE_PROPERTIES_PREFIX = "spring.jpa.properties.";
+   public static final String SPRING_DATASOURCE_PROPERTIES_PREFIX = "spring.datasource.";
    private final Dependency SPRING_BOOT_DATA_JPA = DependencyBuilder.create()
          .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID)
          .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA)
@@ -79,15 +79,15 @@ public class SpringBootJPAFacet extends AbstractJPAFacetImpl<PersistenceDescript
 
    @Override
    public void saveConfig(final PersistenceDescriptor descriptor) {
-      final CollectionStringBuffer buffer = new CollectionStringBuffer();
-
       final Properties<PersistenceUnit<PersistenceDescriptor>> properties = DESCRIPTOR.getOrCreatePersistenceUnit().getOrCreateProperties();
       final List<Property<Properties<PersistenceUnit<PersistenceDescriptor>>>> propertyList = properties.getAllProperty();
+
+      final java.util.Properties toWrite = new java.util.Properties();
       for (Property<Properties<PersistenceUnit<PersistenceDescriptor>>> property : propertyList) {
-         buffer.append(NATIVE_PROPERTIES_PREFIX + property.getName() + "=" + property.getValue());
+         toWrite.put(NATIVE_PROPERTIES_PREFIX + property.getName(), property.getValue());
       }
 
-      SpringBootHelper.writeToApplicationProperties(getFaceted(), buffer);
+      SpringBootHelper.writeToApplicationProperties(getFaceted(), toWrite);
    }
 
 

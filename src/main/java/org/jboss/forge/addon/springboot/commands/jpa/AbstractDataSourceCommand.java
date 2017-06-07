@@ -9,7 +9,6 @@ package org.jboss.forge.addon.springboot.commands.jpa;
 
 import org.jboss.forge.addon.javaee.jpa.JPADataSource;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.context.UIContext;
@@ -21,6 +20,7 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 import javax.inject.Inject;
+import java.util.Properties;
 
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
@@ -35,11 +35,11 @@ public abstract class AbstractDataSourceCommand implements UICommand, UIWizardSt
       JPADataSource dataSource = (JPADataSource) uiContext.getAttributeMap().get(JPADataSource.class);
       updateDataSource(dataSource);
 
-      final CollectionStringBuffer buffer = new CollectionStringBuffer();
-      setProperties(buffer, dataSource);
+      final Properties properties = new Properties();
+      setProperties(properties, dataSource);
 
       final Project project = helper.getProject(uiContext);
-      SpringBootHelper.writeToApplicationProperties(project, buffer);
+      SpringBootHelper.writeToApplicationProperties(project, properties);
 
       return null;
    }
@@ -51,5 +51,5 @@ public abstract class AbstractDataSourceCommand implements UICommand, UIWizardSt
 
    protected abstract void updateDataSource(JPADataSource dataSource);
 
-   protected abstract void setProperties(CollectionStringBuffer buffer, JPADataSource dataSource);
+   protected abstract void setProperties(Properties properties, JPADataSource dataSource);
 }

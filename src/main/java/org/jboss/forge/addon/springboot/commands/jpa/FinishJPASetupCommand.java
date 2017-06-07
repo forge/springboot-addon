@@ -39,6 +39,13 @@ public class FinishJPASetupCommand implements UICommand, UIWizardStep {
       final JPADataSource dataSource = (JPADataSource) attributeMap.get(JPADataSource.class);
 
       persistenceOperations.setup(SpringBootJPAFacet.PERSISTENCE_UNIT_NAME, project, dataSource, false);
+
+      // if we're using H2, Derby or HSQL embedded databases, we need to remove any previously set data
+      // source properties
+      if (!SpringBootPersistenceContainer.isNotEmbeddedDB(dataSource.getDatabase())) {
+         SpringBootHelper.removeSpringDataPropertiesFromApplication(project);
+      }
+      
       return null;
    }
 }

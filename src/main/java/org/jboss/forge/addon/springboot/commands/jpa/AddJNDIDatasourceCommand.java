@@ -8,7 +8,8 @@
 package org.jboss.forge.addon.springboot.commands.jpa;
 
 import org.jboss.forge.addon.javaee.jpa.JPADataSource;
-import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
+
+import java.util.Properties;
 
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
@@ -19,7 +20,8 @@ public class AddJNDIDatasourceCommand extends AbstractDataSourceCommand {
    }
 
    @Override
-   protected void setProperties(CollectionStringBuffer buffer, JPADataSource dataSource) {
-      buffer.append("spring.datasource.jndi-name=" + dataSource.getJndiDataSource());
+   protected void setProperties(Properties properties, JPADataSource dataSource) {
+      properties.put(SpringBootJPAFacet.SPRING_DATASOURCE_PROPERTIES_PREFIX + "jndi-name",
+            dataSource.getJndiDataSource());
    }
 }

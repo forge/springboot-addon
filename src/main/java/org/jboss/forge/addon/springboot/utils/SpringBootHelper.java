@@ -21,6 +21,9 @@ import org.jboss.forge.addon.ui.context.UIContext;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+import java.util.Properties;
 
 public class SpringBootHelper {
 
@@ -125,28 +128,66 @@ public class SpringBootHelper {
       return applicationFile;
    }
 
-   public static void writeToApplicationProperties(Project project, CollectionStringBuffer lines) {
-      writeToApplicationProperties(project, false, lines);
+   public static void writeToApplicationProperties(Project project, Properties properties) {
+      writeToApplicationProperties(project, false, properties);
    }
 
-   public static void writeToApplicationProperties(Project project, boolean replace, CollectionStringBuffer lines) {
-      if (lines != null) {
+   public static void writeToApplicationProperties(Project project, boolean replaceCompletely, Properties properties) {
+      if (properties != null) {
          final FileResource<?> applicationFile = getApplicationProperties(project);
 
-         final StringBuilder sb;
-         if (!replace) {
-            final String contents = applicationFile.getContents();
-            sb = new StringBuilder(contents.length() + lines.size());
-            sb.append(contents).append(LINE_SEPARATOR);
+         final Properties newProps;
+         if (!replaceCompletely) {
+            // load existing properties and merge them with the new ones, replacing old values with new ones when the
+            // new properties provide values for already existing keys
+            try (InputStream inStream = applicationFile.getResourceInputStream()) {
+               newProps = new Properties();
+               newProps.load(inStream);
+
+               for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                  newProps.put(entry.getKey(), entry.getValue());
+               }
+
+
+            } catch (IOException e) {
+               throw new RuntimeException("Couldn't read existing " + applicationFile.getFullyQualifiedName(), e);
+            }
+
          } else {
-            sb = new StringBuilder(lines.size());
+            newProps = properties;
          }
 
-         lines.setSeparator(LINE_SEPARATOR);
-         sb.append(lines);
+         try (OutputStream out = applicationFile.getResourceOutputStream()) {
+            newProps.store(out, null);
+         } catch (IOException e) {
+            throw new RuntimeException("Couldn't save " + applicationFile.getFullyQualifiedName(), e);
+         }
+      }
+   }
 
+   public static void removeSpringDataPropertiesFromApplication(Project project) {
+      final FileResource<?> applicationFile = getApplicationProperties(project);
 
-         applicationFile.setContents(sb.toString());
+      Properties initial = new Properties();
+      Properties newProps = new Properties();
+      try (InputStream inStream = applicationFile.getResourceInputStream()) {
+         initial.load(inStream);
+
+         for (Map.Entry<Object, Object> entry : initial.entrySet()) {
+            final Object key = entry.getKey();
+            if (!key.toString().startsWith(SpringBootJPAFacet.SPRING_DATASOURCE_PROPERTIES_PREFIX)) {
+               newProps.put(key, entry.getValue());
+            }
+         }
+
+      } catch (IOException e) {
+         throw new RuntimeException("Couldn't read existing " + applicationFile.getFullyQualifiedName(), e);
+      }
+
+      try (OutputStream out = applicationFile.getResourceOutputStream()) {
+         newProps.store(out, null);
+      } catch (IOException e) {
+         throw new RuntimeException("Couldn't save " + applicationFile.getFullyQualifiedName(), e);
       }
    }
 

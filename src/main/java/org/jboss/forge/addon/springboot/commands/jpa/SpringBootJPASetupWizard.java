@@ -32,7 +32,8 @@ import org.springframework.boot.jdbc.DatabaseDriver;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static org.jboss.forge.addon.javaee.jpa.DatabaseType.*;
+import static org.jboss.forge.addon.javaee.jpa.DatabaseType.H2;
+import static org.jboss.forge.addon.springboot.commands.jpa.SpringBootPersistenceContainer.isNotEmbeddedDB;
 
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
@@ -92,7 +93,7 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
          validator.addValidationError(dbType, "Spring Boot doesn't know about DB '" + dbType.getName() + "'");
       }
 
-      if (!isEmbeddedDB(database) && !databaseURL.hasValue() && !dataSourceName.hasValue()) {
+      if (isNotEmbeddedDB(database) && !databaseURL.hasValue() && !dataSourceName.hasValue()) {
          validator.addValidationError(dataSourceName, "Either DataSource name or database URL is required");
          validator.addValidationError(databaseURL, "Either DataSource name or database URL is required");
       }
@@ -120,9 +121,8 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       applyUIValues(context.getUIContext());
 
       final DatabaseType database = dbType.getValue();
-      if (isEmbeddedDB(database)) {
-         // if we're using H2, Derby or HSQL embedded databases, we're done!
-         return null;
+      if (!isNotEmbeddedDB(database)) {
+         return Results.navigateTo(FinishJPASetupCommand.class);
       } else {
          if (dataSourceName.hasValue()) {
             // if we specified a datasource, use it
@@ -132,10 +132,6 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
             return Results.navigateTo(AddDBURLCommand.class);
          }
       }
-   }
-
-   private boolean isEmbeddedDB(DatabaseType database) {
-      return database.equals(H2) || database.equals(DERBY) || database.equals(HSQLDB);
    }
 
    private JPADataSource applyUIValues(final UIContext context) {

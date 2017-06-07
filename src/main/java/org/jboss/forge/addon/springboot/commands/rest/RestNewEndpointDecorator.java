@@ -13,7 +13,6 @@ import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.parser.java.ui.JavaSourceDecorator;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
-import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.roaster.Roaster;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.core.UriBuilder;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -70,13 +70,13 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
       facet.saveJavaSource(createGreetingClass(source));
       facet.saveJavaSource(createGreetingPropertiesClass(source));
 
-      final CollectionStringBuffer lines = new CollectionStringBuffer();
+      final Properties properties = new Properties();
       if (wrapped.getPath().hasValue()) {
          final String value = wrapped.getPath().getValue();
-         lines.append("server.contextPath=" + (value.startsWith("/") ? value : "/" + value));
+         properties.put("server.contextPath", (value.startsWith("/") ? value : "/" + value));
       }
-      lines.append("greeting.message=Hello, %s!");
-      SpringBootHelper.writeToApplicationProperties(project, lines);
+      properties.put("greeting.message", "Hello, %s!");
+      SpringBootHelper.writeToApplicationProperties(project, properties);
 
       // Create the Controller
       source.addImport(AtomicLong.class);
