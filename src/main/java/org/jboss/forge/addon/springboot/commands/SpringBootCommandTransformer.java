@@ -9,12 +9,14 @@ package org.jboss.forge.addon.springboot.commands;
 
 import org.jboss.forge.addon.javaee.jpa.ui.JPANewEntityCommand;
 import org.jboss.forge.addon.javaee.jpa.ui.setup.JPASetupWizard;
+import org.jboss.forge.addon.javaee.rest.ui.RestEndpointFromEntityCommand;
 import org.jboss.forge.addon.javaee.rest.ui.RestNewEndpointCommand;
 import org.jboss.forge.addon.parser.java.ui.AbstractJavaSourceCommand;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.commands.jpa.CreateSpringBootJPASupportDecorator;
 import org.jboss.forge.addon.springboot.commands.jpa.SpringBootJPASetupWizard;
+import org.jboss.forge.addon.springboot.commands.rest.RestGenerateFromEntitiesCommand;
 import org.jboss.forge.addon.springboot.commands.rest.RestNewEndpointDecorator;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.command.UICommand;
@@ -55,7 +57,10 @@ public class SpringBootCommandTransformer implements UICommandTransformer {
          if (original instanceof JPANewEntityCommand) {
             return JavaSourceCommandWrapper.wrap(original,
                   new CreateSpringBootJPASupportDecorator((AbstractJavaSourceCommand) original));
+         }
 
+         if (original instanceof RestEndpointFromEntityCommand) {
+            return new RestGenerateFromEntitiesCommand((RestEndpointFromEntityCommand) original, helper);
          }
       }
 

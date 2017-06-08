@@ -6,6 +6,7 @@
  */
 package org.jboss.forge.addon.springboot.utils;
 
+import org.jboss.forge.addon.dependencies.Dependency;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
@@ -99,13 +100,17 @@ public class SpringBootHelper {
    }
 
    public static DependencyBuilder addDependency(Project project, String groupId, String artifactId) {
-      final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
-      final DependencyBuilder dependency = DependencyBuilder.create()
-            .setArtifactId(artifactId)
-            .setGroupId(groupId);
-      dependencyFacet.addDirectDependency(dependency);
+      return addDependency(project, DependencyBuilder.create().setArtifactId(artifactId).setGroupId(groupId));
+   }
 
-      return dependency;
+   public static DependencyBuilder addDependency(Project project, Dependency dependency) {
+      final DependencyFacet dependencyFacet = project.getFacet(DependencyFacet.class);
+      final DependencyBuilder builder = dependency instanceof DependencyBuilder
+            ? (DependencyBuilder) dependency : DependencyBuilder.create(dependency);
+
+      dependencyFacet.addDirectDependency(builder);
+
+      return builder;
    }
 
    /**

@@ -26,6 +26,33 @@ public class SpringBootFacet extends AbstractProjectFacet {
          .setGroupId(SPRING_BOOT_GROUP_ID)
          .setArtifactId(SPRING_BOOT_STARTER_ARTIFACT);
 
+   // dependencies for REST
+
+   public static final Dependency CXF_SPRING_BOOT = DependencyBuilder.create()
+         .setGroupId("org.apache.cxf")
+         .setArtifactId("cxf-spring-boot-starter-jaxrs")
+         .setVersion("3.1.11");
+   public static final Dependency JACKSON_JAXRS_PROVIDER = DependencyBuilder.create()
+         .setGroupId("com.fasterxml.jackson.jaxrs")
+         .setArtifactId("jackson-jaxrs-json-provider");
+
+   // dependencies added by EE Forge commands to remove
+
+   public static final Dependency JBOSS_SERVLET_SPEC = DependencyBuilder.create()
+         .setGroupId("org.jboss.spec.javax.servlet")
+         .setArtifactId("jboss-servlet-api_3.0_spec");
+   public static final Dependency JBOSS_JAXRS_SPEC = DependencyBuilder.create()
+         .setGroupId("org.jboss.spec.javax.ws.rs")
+         .setArtifactId("jboss-jaxrs-api_1.1_spec");
+   public static final Dependency JBOSS_EJB_SPEC = DependencyBuilder.create()
+         .setGroupId("org.jboss.spec.javax.ejb")
+         .setArtifactId("jboss-ejb-api_3.1_spec");
+   public static final Dependency JBOSS_EE_SPEC = DependencyBuilder.create()
+         .setGroupId("org.jboss.spec")
+         .setArtifactId("jboss-javaee-6.0")
+         .setPackaging("pom");
+
+
    @Override
    public boolean install() {
       return true;
