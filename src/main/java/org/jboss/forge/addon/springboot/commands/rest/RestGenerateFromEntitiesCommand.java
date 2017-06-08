@@ -7,6 +7,7 @@
  */
 package org.jboss.forge.addon.springboot.commands.rest;
 
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.javaee.rest.ui.RestEndpointFromEntityCommand;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
@@ -19,6 +20,8 @@ import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
+
+import java.util.Properties;
 
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
@@ -66,6 +69,12 @@ public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep 
       facet.removeDependency(SpringBootFacet.JBOSS_JAXRS_SPEC);
       facet.removeDependency(SpringBootFacet.JBOSS_SERVLET_SPEC);
       facet.removeManagedDependency(SpringBootFacet.JBOSS_EE_SPEC);
+
+      // add CXF properties to application.properties
+      final Properties cxfProps = new Properties();
+      cxfProps.put("cxf.jaxrs.component-scan", "true");
+      cxfProps.put("cxf.path", "/rest");
+      SpringBootHelper.writeToApplicationProperties(project, cxfProps);
 
       return result;
    }
