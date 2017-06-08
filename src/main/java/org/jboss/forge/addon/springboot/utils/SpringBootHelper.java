@@ -197,12 +197,7 @@ public class SpringBootHelper {
    }
 
    public Project getProject(UIContext uiContext) {
-      final Project project = Projects.getSelectedProject(projectFactory, uiContext);
-      if (project == null) {
-         throw new IllegalStateException("A project is required in the current context");
-      }
-
-      return project;
+      return Projects.getSelectedProject(projectFactory, uiContext);
    }
 
    public SpringBootJPAFacet installJPAFacet(Project project) {
