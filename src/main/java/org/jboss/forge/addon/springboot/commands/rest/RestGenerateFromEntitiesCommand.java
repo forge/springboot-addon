@@ -52,15 +52,16 @@ public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep 
       final Result result = original.execute(context);
 
       final Project project = helper.getProject(context.getUIContext());
-
-      // add dependencies
-      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
-      SpringBootHelper.addDependency(project, SpringBootFacet.CXF_SPRING_BOOT);
-      SpringBootHelper.addDependency(project, SpringBootFacet.JACKSON_JAXRS_PROVIDER);
-
-      // remove EE dependencies
       final DependencyFacet facet = project.getFacet(DependencyFacet.class);
 
+      // add dependencies
+      facet.addDirectDependency(DependencyBuilder.create()
+            .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID)
+            .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_WEB));
+      facet.addDirectDependency(SpringBootFacet.CXF_SPRING_BOOT);
+      facet.addDirectDependency(SpringBootFacet.JACKSON_JAXRS_PROVIDER);
+
+      // remove EE dependencies
       facet.removeDependency(SpringBootFacet.JBOSS_EJB_SPEC);
       facet.removeDependency(SpringBootFacet.JBOSS_JAXRS_SPEC);
       facet.removeDependency(SpringBootFacet.JBOSS_SERVLET_SPEC);
