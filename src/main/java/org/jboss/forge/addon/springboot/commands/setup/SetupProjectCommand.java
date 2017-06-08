@@ -7,16 +7,22 @@
 package org.jboss.forge.addon.springboot.commands.setup;
 
 import org.jboss.forge.addon.facets.FacetFactory;
+import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
+import org.jboss.forge.addon.parser.java.resources.JavaResource;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
+import org.jboss.forge.addon.projects.facets.ResourcesFacet;
 import org.jboss.forge.addon.resource.DirectoryResource;
+import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.rest.ClientFactory;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.dto.SpringBootDependencyDTO;
 import org.jboss.forge.addon.springboot.utils.CollectionStringBuffer;
+import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
+import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
@@ -28,6 +34,8 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
+import org.jboss.forge.roaster.Roaster;
+import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -88,6 +96,16 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    @Inject
    @WithAttributes(label = "Spring Boot Version", description = "Spring Boot Version to use")
    private UISelectOne<String> springBootVersion;
+
+   @Inject
+   @WithAttributes(label = "Create static content?", description = "Should we create static content?", defaultValue =
+         "false")
+   private UIInput<Boolean> createStaticContent;
+
+   @Inject
+   @WithAttributes(label = "Port", description = "The port on which the application will run", defaultValue =
+         "8080")
+   private UIInput<Integer> port;
 
    @Inject
    @WithAttributes(label = "Dependencies", description = "Add Spring Boot Starters and dependencies to your application")
@@ -152,7 +170,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
          return null;
       });
 
-      builder.add(springBootVersion).add(dependencies);
+      builder.add(springBootVersion).add(dependencies).add(createStaticContent).add(port);
    }
 
    private List<SpringBootDependencyDTO> initDependencies(UIOutput uiOutput) throws Exception
@@ -276,6 +294,46 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
       // and delete the zip file
       name.delete();
+
+      // set port if needed
+      final Integer portValue = port.getValue();
+      if (portValue != 8080) {
+         final Properties properties = new Properties();
+         properties.put("server.port", portValue.toString());
+         SpringBootHelper.writeToApplicationProperties(project, properties);
+      }
+
+      final Boolean createStatic = createStaticContent.getValue();
+      if (createStatic) {
+         // create static sub-directory
+         final ResourcesFacet resourcesFacet = project.getFacet(ResourcesFacet.class);
+         final FileResource<?> staticDir = resourcesFacet.getResource("static");
+         if (!staticDir.exists()) {
+            staticDir.mkdirs();
+         }
+
+         // add SpringBootServletInitializer to generated Spring Boot application
+         final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
+         final DirectoryResource targetPackage = sourceFacet.getPackage(projectGroupId);
+
+         // todo: find a better way than hardcode app name, maybe iterate over files and look for @SpringBootApplication
+         final JavaResource sbAppResource = targetPackage.getChild("DemoApplication.java").as(JavaResource.class);
+         if (sbAppResource.exists()) {
+            JavaClassSource sbApp = Roaster.parse(JavaClassSource.class, sbAppResource.getResourceInputStream());
+
+            sbApp.addImport("org.springframework.boot.builder.SpringApplicationBuilder");
+            sbApp.setSuperType("org.springframework.boot.web.support.SpringBootServletInitializer");
+            sbApp.addMethod("@Override\n" +
+                  "               protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {\n" +
+                  "                  return application.sources(" + sbApp.getName() + ".class);\n" +
+                  "               }");
+
+            sourceFacet.saveJavaSource(sbApp);
+         }
+
+         // add web dependency
+         SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
+      }
 
       // are there any fabric8 dependencies to add afterwards?
       return Results.success(
