@@ -9,15 +9,21 @@ package org.jboss.forge.addon.springboot.utils;
 import org.jboss.forge.addon.dependencies.Dependency;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.facets.FacetFactory;
+import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
+import org.jboss.forge.addon.parser.java.resources.JavaResource;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.Projects;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
+import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
+import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.commands.jpa.SpringBootJPAFacet;
 import org.jboss.forge.addon.ui.context.UIContext;
+import org.jboss.forge.roaster.Roaster;
+import org.jboss.forge.roaster.model.source.JavaClassSource;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -206,5 +212,27 @@ public class SpringBootHelper {
          throw new RuntimeException("SpringBoot JPA Facet didn't get installed");
       }
       return jpaFacet;
+   }
+
+   public static void modifySpringBootApplication(Project project, SpringBootApplicationDecorator decorator) {
+      final MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
+      final String projectGroupId = metadataFacet.getProjectGroupName();
+      final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
+      final DirectoryResource targetPackage = sourceFacet.getPackage(projectGroupId);
+
+      // todo: find a better way than hardcode app name, maybe iterate over files and look for @SpringBootApplication
+      final JavaResource sbAppResource = targetPackage.getChild("DemoApplication.java").as(JavaResource.class);
+      if (sbAppResource.exists()) {
+         JavaClassSource sbApp = Roaster.parse(JavaClassSource.class, sbAppResource.getResourceInputStream());
+
+         decorator.modify(sbApp);
+
+         sourceFacet.saveJavaSource(sbApp);
+      }
+   }
+
+   @FunctionalInterface
+   public interface SpringBootApplicationDecorator {
+      JavaClassSource modify(JavaClassSource sbApp);
    }
 }

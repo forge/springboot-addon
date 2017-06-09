@@ -7,8 +7,6 @@
 package org.jboss.forge.addon.springboot.commands.setup;
 
 import org.jboss.forge.addon.facets.FacetFactory;
-import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
-import org.jboss.forge.addon.parser.java.resources.JavaResource;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
 import org.jboss.forge.addon.projects.facets.ResourcesFacet;
@@ -34,8 +32,6 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Commands;
 import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
-import org.jboss.forge.roaster.Roaster;
-import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -313,14 +309,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
          }
 
          // add SpringBootServletInitializer to generated Spring Boot application
-         final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
-         final DirectoryResource targetPackage = sourceFacet.getPackage(projectGroupId);
-
-         // todo: find a better way than hardcode app name, maybe iterate over files and look for @SpringBootApplication
-         final JavaResource sbAppResource = targetPackage.getChild("DemoApplication.java").as(JavaResource.class);
-         if (sbAppResource.exists()) {
-            JavaClassSource sbApp = Roaster.parse(JavaClassSource.class, sbAppResource.getResourceInputStream());
-
+         SpringBootHelper.modifySpringBootApplication(project, sbApp -> {
             sbApp.addImport("org.springframework.boot.builder.SpringApplicationBuilder");
             sbApp.setSuperType("org.springframework.boot.web.support.SpringBootServletInitializer");
             sbApp.addMethod("@Override\n" +
@@ -328,8 +317,8 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
                   "                  return application.sources(" + sbApp.getName() + ".class);\n" +
                   "               }");
 
-            sourceFacet.saveJavaSource(sbApp);
-         }
+            return sbApp;
+         });
 
          // add web dependency
          SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
