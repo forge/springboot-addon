@@ -321,7 +321,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
          });
 
          // add web dependency
-         SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
+         SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB_ARTIFACT);
       }
 
       // are there any fabric8 dependencies to add afterwards?

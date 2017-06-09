@@ -18,9 +18,18 @@ import org.jboss.forge.addon.projects.facets.DependencyFacet;
  * @author <a href="claprun@redhat.com>Christophe Laprun</a>
  */
 public class SpringBootFacet extends AbstractProjectFacet {
-   public static final String SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
-   public static final String SPRING_BOOT_STARTER_DATA_JPA = "spring-boot-starter-data-jpa";
    public static final String SPRING_BOOT_GROUP_ID = "org.springframework.boot";
+
+   public static final String SPRING_BOOT_STARTER_WEB_ARTIFACT = "spring-boot-starter-web";
+   public static final Dependency SPRING_BOOT_STARTER_WEB = DependencyBuilder.create()
+         .setGroupId(SPRING_BOOT_GROUP_ID)
+         .setArtifactId(SPRING_BOOT_STARTER_WEB_ARTIFACT);
+
+   public static final String SPRING_BOOT_STARTER_DATA_JPA_ARTIFACT = "spring-boot-starter-data-jpa";
+   public static final Dependency SPRING_BOOT_DATA_JPA = DependencyBuilder.create()
+         .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID)
+         .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA_ARTIFACT)
+         .setScopeType("provided");
    private static final String SPRING_BOOT_STARTER_ARTIFACT = "spring-boot-starter";
    private static final Dependency SPRING_BOOT_STARTER = DependencyBuilder.create()
          .setGroupId(SPRING_BOOT_GROUP_ID)

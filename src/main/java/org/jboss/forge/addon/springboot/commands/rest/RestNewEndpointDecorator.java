@@ -63,7 +63,7 @@ public class RestNewEndpointDecorator implements JavaSourceDecorator<JavaClassSo
    @Override
    public JavaClassSource decorateSource(UIExecutionContext context, Project project, JavaClassSource source) throws Exception {
       // Check that we have the spring-boot-starter-web dependency and add it if we don't
-      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB);
+      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_WEB_ARTIFACT);
 
       // Create Java Classes Greeting and GreetingProperties
       JavaSourceFacet facet = project.getFacet(JavaSourceFacet.class);

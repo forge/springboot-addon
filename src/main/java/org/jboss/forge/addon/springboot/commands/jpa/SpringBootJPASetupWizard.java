@@ -110,7 +110,7 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       final Coordinate driverCoordinate = database.getDriverCoordinate();
       SpringBootHelper.addDependency(project, driverCoordinate.getGroupId(), driverCoordinate.getArtifactId())
             .setScopeType("runtime");
-      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA)
+      SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA_ARTIFACT)
             .setScopeType("runtime");
 
       return Results.success("Spring Boot JPA successfully set up!");

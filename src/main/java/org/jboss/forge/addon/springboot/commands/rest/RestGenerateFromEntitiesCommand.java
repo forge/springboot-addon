@@ -7,7 +7,6 @@
  */
 package org.jboss.forge.addon.springboot.commands.rest;
 
-import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.javaee.rest.ui.RestEndpointFromEntityCommand;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
@@ -60,9 +59,7 @@ public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep 
       final DependencyFacet facet = project.getFacet(DependencyFacet.class);
 
       // add dependencies
-      facet.addDirectDependency(DependencyBuilder.create()
-            .setGroupId(SpringBootFacet.SPRING_BOOT_GROUP_ID)
-            .setArtifactId(SpringBootFacet.SPRING_BOOT_STARTER_WEB));
+      facet.addDirectDependency(SpringBootFacet.SPRING_BOOT_STARTER_WEB);
       facet.addDirectDependency(SpringBootFacet.CXF_SPRING_BOOT);
       facet.addDirectDependency(SpringBootFacet.JACKSON_JAXRS_PROVIDER);
 
