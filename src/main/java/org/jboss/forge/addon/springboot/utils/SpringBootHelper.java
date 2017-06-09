@@ -214,14 +214,14 @@ public class SpringBootHelper {
       return jpaFacet;
    }
 
-   public static void modifySpringBootApplication(Project project, SpringBootApplicationDecorator decorator) {
+   public static void modifyJavaClassInDefaultPackage(Project project, String className, JavaClassSourceDecorator
+         decorator) {
       final MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
       final String projectGroupId = metadataFacet.getProjectGroupName();
       final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
       final DirectoryResource targetPackage = sourceFacet.getPackage(projectGroupId);
 
-      // todo: find a better way than hardcode app name, maybe iterate over files and look for @SpringBootApplication
-      final JavaResource sbAppResource = targetPackage.getChild("DemoApplication.java").as(JavaResource.class);
+      final JavaResource sbAppResource = targetPackage.getChild(className).as(JavaResource.class);
       if (sbAppResource.exists()) {
          JavaClassSource sbApp = Roaster.parse(JavaClassSource.class, sbAppResource.getResourceInputStream());
 
@@ -231,8 +231,13 @@ public class SpringBootHelper {
       }
    }
 
+   public static void modifySpringBootApplication(Project project, JavaClassSourceDecorator decorator) {
+      // todo: find a better way than hardcode app name, maybe iterate over files and look for @SpringBootApplication
+      modifyJavaClassInDefaultPackage(project, "DemoApplication.java", decorator);
+   }
+
    @FunctionalInterface
-   public interface SpringBootApplicationDecorator {
+   public interface JavaClassSourceDecorator {
       JavaClassSource modify(JavaClassSource sbApp);
    }
 }
