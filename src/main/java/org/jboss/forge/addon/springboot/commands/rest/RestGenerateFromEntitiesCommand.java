@@ -81,7 +81,7 @@ public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep 
       SpringBootHelper.modifySpringBootApplication(project, sbApp -> {
          sbApp.addImport("com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider");
 
-         final MethodSource<JavaClassSource> method = sbApp.addMethod("public JacksonJsonProvider Config() {\n" +
+         final MethodSource<JavaClassSource> method = sbApp.addMethod("public JacksonJsonProvider config() {\n" +
                "\t\treturn new JacksonJsonProvider();\n" +
                "\t}");
          method.addAnnotation("org.springframework.context.annotation.Bean");
