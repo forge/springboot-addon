@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public class SpringBootHelper {
@@ -214,12 +215,12 @@ public class SpringBootHelper {
       return jpaFacet;
    }
 
-   public static void modifyJavaClassInDefaultPackage(Project project, String className, JavaClassSourceDecorator
-         decorator) {
-      final MetadataFacet metadataFacet = project.getFacet(MetadataFacet.class);
-      final String projectGroupId = metadataFacet.getProjectGroupName();
+   public static void modifyJavaClass(Project project, String className, Optional<String> packageName,
+                                      JavaClassSourceDecorator decorator) {
+
+      final String packageLocation = packageName.orElseGet(() -> project.getFacet(MetadataFacet.class).getProjectGroupName());
       final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
-      final DirectoryResource targetPackage = sourceFacet.getPackage(projectGroupId);
+      final DirectoryResource targetPackage = sourceFacet.getPackage(packageLocation);
 
       final JavaResource sbAppResource = targetPackage.getChild(className).as(JavaResource.class);
       if (sbAppResource.exists()) {
@@ -233,11 +234,11 @@ public class SpringBootHelper {
 
    public static void modifySpringBootApplication(Project project, JavaClassSourceDecorator decorator) {
       // todo: find a better way than hardcode app name, maybe iterate over files and look for @SpringBootApplication
-      modifyJavaClassInDefaultPackage(project, "DemoApplication.java", decorator);
+      modifyJavaClass(project, "DemoApplication.java", Optional.empty(), decorator);
    }
 
    @FunctionalInterface
    public interface JavaClassSourceDecorator {
-      JavaClassSource modify(JavaClassSource sbApp);
+      JavaClassSource modify(JavaClassSource source);
    }
 }
