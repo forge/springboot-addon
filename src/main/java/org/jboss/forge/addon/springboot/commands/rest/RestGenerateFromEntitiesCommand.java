@@ -20,6 +20,8 @@ import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
+import org.jboss.forge.roaster.model.source.JavaClassSource;
+import org.jboss.forge.roaster.model.source.MethodSource;
 
 import java.util.Properties;
 
@@ -75,6 +77,17 @@ public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep 
       cxfProps.put("cxf.jaxrs.component-scan", "true");
       cxfProps.put("cxf.path", "/rest");
       SpringBootHelper.writeToApplicationProperties(project, cxfProps);
+
+      SpringBootHelper.modifySpringBootApplication(project, sbApp -> {
+         sbApp.addImport("com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider");
+
+         final MethodSource<JavaClassSource> method = sbApp.addMethod("public JacksonJsonProvider Config() {\n" +
+               "\t\treturn new JacksonJsonProvider();\n" +
+               "\t}");
+         method.addAnnotation("org.springframework.context.annotation.Bean");
+
+         return sbApp;
+      });
 
       return result;
    }
