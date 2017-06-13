@@ -112,7 +112,7 @@ project-new --named demo --version 1.0 --top-level-package org.demo --type sprin
 
 Persistence setup::
 
-Whenever it is required to setup the Hibernate provider using the `spring-boot-starter-data-jpa, then you can use the following command
+Whenever it is required to use the `spring-boot-starter-data-jpa` starter and to setup the Hibernate provider, then you can use the following command
 +
 ----
 jpa-setup
