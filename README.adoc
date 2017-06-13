@@ -104,7 +104,7 @@ available dependencies that can then be auto-completed.
 
 One line::
 
-You can create your project using one `command line with the required parameters:
+You can create your project using one `command line` with the required parameters:
 +
 ----
 project-new --named demo --version 1.0 --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.3 --dependencies actuator elasticsearch
