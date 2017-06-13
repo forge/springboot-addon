@@ -78,12 +78,12 @@ The Spring Boot addon reuses standard commands adding options and/or new command
 
 Spring Boot Project type::
 
-If you want to create a new Spring Boot starter project as you can do using the site `start.spring.io`, simply use the `project-new` command where you specify `spring-boot` as project type.
+If you want to create a new Spring Boot starter project as you can do using `start.spring.io`, simply use the `project-new` command where you include `spring-boot` as project type.
 The command will issue a REST call against `start.spring.io`, will get a zip file containing the maven project created according to the parameters passed.
 +
-The content of this file will be unzipped locally according under the directory as defined by the `--named` parameter.
+The content of this file will be unzipped locally under the directory as defined by the `--named` parameter.
 +
-When no Spring Boot starters / dependencies is defined, then `start.spring.io` will return a project containing
+When no Spring Boot starters / dependencies are defined, then `start.spring.io` will return a project containing
 the `spring-boot-starter` and `spring-boot-starter-test` maven artifacts using the default Spring version which is `1.5.3.RELEASE`
 +
 ----
@@ -92,8 +92,8 @@ project-new --named example --type spring-boot
 
 Starter Version and dependencies::
 
-You can specify which Spring Boot starter version you want to use using the `--spring-boot-version` parameter like also the starters with
-the `--dependencies` option, with is a defined as a space-separated list of dependencies.
+You can specify which Spring Boot starter version you want to use when the project will be created using the `--spring-boot-version` option like also the starters to be included within the pom.xml file
+with the `--dependencies` option, which is defined as a space-separated list of dependencies.
 +
 ----
 project-new --named example --type spring-boot --spring-boot-version 1.5.3 --dependencies actuator web
