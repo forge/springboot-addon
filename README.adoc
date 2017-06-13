@@ -189,6 +189,27 @@ The Spring Boot mode is activated by using the `SPRING_BOOT_JPA_ENTITY` generato
 rest-generate-endpoints-from-entities --generator SPRING_BOOT_JPA_ENTITY --targets ...
 ----
 +
+Example of code generated:
++
+[source,java]
+----
+@Path("/catalogs")
+@Component
+@Transactional
+public class CatalogEndpoint {
+	@PersistenceContext
+	private EntityManager em;
+
+	@POST
+	@Consumes("application/json")
+	public Response create(Catalog entity) {
+		em.persist(entity);
+		return Response.created(
+				UriBuilder.fromResource(CatalogEndpoint.class)
+						.path(String.valueOf(entity.getId())).build()).build();
+	}
+----
++
 WARNING: Note that the resources derived from the JPA entities are currently limited to JSON representations (with the Jackson JSON stack).
 
 Generate a REST endpoint::
