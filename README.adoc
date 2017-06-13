@@ -266,7 +266,7 @@ public class NewCrossOriginResourceSharingFilter
 
 Define the starters to be selected::
 
-If you want to use a list of choosen dependencies/starters to be selected when you will create your project,
+If you want to restrict the list of dependencies/starters to be selected (or to use according to your needs) when you will create your project,
 pass the reference of this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE` to the command `project-new`
 +
 [source,java]
