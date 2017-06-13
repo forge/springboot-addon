@@ -76,26 +76,76 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 == Features
 The Spring Boot addon reuses standard commands adding options and/or new commands only when required.
 
-Supported commands::
+Spring Boot Project type::
 
-- `project-new` will create Spring Boot projects if you specify the `spring-boot` type options:
+If you are creating a new project, you can use the `spring-boot` type directly with the `project-new` command and a Spring Boot project will be created
+by issuying a REST call against the server `start.spring.io` in order to get the zipped created file. The content of this file will be unzipped
+locally according to the `--named` parameter specify
++
+----
+project-new --named example --type spring-boot
+----
+
+Starter Version and dependencies::
+
+You can specify which Spring Boot starter version to use using the `--spring-boot-version`, defaulting to `1.5.4.RELEASE`.
+You can add Spring Boot dependencies using the `--dependencies` option, specifying a space-separated list of
+dependencies. Note that pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
+available dependencies that can then be auto-completed.
 +
 ----
 project-new --named example --type spring-boot --spring-boot-version 1.5.3 --dependencies actuator web
 ----
-You can specify which Spring Boot version to use using the `--spring-boot-version`, defaulting to `1.5.4.RELEASE`.
-You can add Spring Boot dependencies using the `--dependencies` option, specifying a space-separated list of
-dependencies. Note that pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
- available dependencies that can then be auto-completed.
 
-- `jpa-setup` will set things up to use JPA with an Hibernate persistence provider and configured with the
-appropriate driver and sane default settings. Also, by default, if no database is specified, H2 is used.
+Persistence setup::
 
-- `jpa-new-entity` will create a new JPA entity using a Spring Boot flavor as, for each entity, we also generate an
+Whenever it is required to setup the Hibernate provider using the `spring-boot-starter-data-jpa, then you can use the following command
++
+----
+jpa-setup
+----
+
+The persistence provider will be configured with the appropriate driver and sane default settings.
+Also, by default, if no database is specified, H2 is used.
+To configure by example mysql, pass these parameters
++
+----
+jpa-setup --db-type MYSQL --database-url jdbc:mysql://mysql:3306/catalogdb --username mysql --password mysql
+----
+and the command will populate accordingly the Spring jpa and datasource keys
++
+----
+spring.datasource.url=jdbc\:mysql\://mysql\:3306/catalogdb
+spring.datasource.username=mysql
+spring.datasource.password=mysql
+
+spring.jpa.properties.hibernate.transaction.flush_before_completion=true
+spring.jpa.properties.hibernate.show_sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.hbm2ddl.auto=create-drop
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+----
+
+Entities & fields::
+
+In order to create Entity classes representing the Java class to be mapped with the Database tables, use this command
++
+----
+jpa-new-entity --named Catalog
+jpa-new-field --named artist
+jpa-new-field --named title
+jpa-new-field --named description --length 2000
+jpa-new-field --named price --type java.lang.Float
+jpa-new-field --named publication_date --type java.util.Date --temporalType DATE
+----
+
+Then a new JPA entity will be created, fields included we also generate an
 associated `CrudRepository` and a `RepositoryConfiguration` class.
 
-- `rest-generate-endpoints-from-entities` will generate JAX-RS RESTful endpoints based on JPA entities. The behavior
-is customized for Spring Boot and defaults to use the Apache CXF stack. The Spring Boot mode is activated by using
+Expose your entitites as REST endpoints::
+
+The command `rest-generate-endpoints-from-entities` will generate JAX-RS RESTful endpoints based on JPA entities. The behavior
+is customized for Spring Boot and defaults to use the Apache CXF stack which supports the `JAX-RS` specification. The Spring Boot mode is activated by using
 a custom `SPRING_BOOT_JPA_ENTITY` generator:
 +
 ----
@@ -104,17 +154,23 @@ rest-generate-endpoints-from-entities --generator SPRING_BOOT_JPA_ENTITY --targe
 Note that the resources derived from the JPA entities are currently limited to JSON representations (with the Jackson
  JSON stack).
 
-- `rest-new-endpoint`: to document, not well tested
+Generate a REST endpoint::
 
-- `rest-new-cross-origin-resource-sharing-filter` will create a CORS filter so that cross-origin requests are allowed
-. The filter is also annotated so that it is automatically recognized by the Apache CXF implementation.
+To create a Greeting REST endpoint within the Spring Boot starter project created, use this command
++
+----
+rest-new-endpoint
+----
 
+Support CORS::
 
+The rest-new-cross-origin-resource-sharing-filter` `ommand will create a CORS filter so that cross-origin requests are allowed.
+The filter is also annotated so that it is automatically recognized by the Apache CXF implementation.
 
-TODO: Check this part
-Use your Config File::
-If you want to use a YAML config file containing the dependencies to be used for your project, you can create such a file according to the convention defined by
-http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#configuration-format[Spring Initialzr] and pass the reference to this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
+Define the starters to be used::
+
+If you want to use a Spring Boot YAML config file containing the dependencies/starters to be used for your project when it will be created with the command `project-new`,
+pass the reference of this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
 +
 [source,java]
 ----
@@ -125,3 +181,5 @@ spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
 +
 An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]. Only the dependencies section will be used to
 populate the pom.xml.
+
+NOTE: you can create such a file according to the convention defined by http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#configuration-format[Spring Initialzr]
