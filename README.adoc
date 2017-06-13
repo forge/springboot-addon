@@ -159,7 +159,10 @@ The command also generate the `CrudRepository` used with the `spring-boot-starte
 +
 [source,java]
 ----
+import org.springframework.data.repository.CrudRepository;
 
+public interface CatalogRepository extends CrudRepository<Catalog, Long> {
+}
 ----
 +
 and a `RepositoryConfiguration` class.
