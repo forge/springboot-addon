@@ -119,8 +119,8 @@ jpa-setup
 ----
 +
 The persistence provider will be configured with the appropriate driver and sane default settings.
-Also, by default, if no database is specified, H2 is used.
-To configure by example mysql, pass these parameters
+Also, by default, if no database is specified, H2 database "in-memory" is used.
+To configure by example mysql, pass these parameters:
 +
 ----
 jpa-setup --db-type MYSQL --database-url jdbc:mysql://mysql:3306/catalogdb --username mysql --password mysql
