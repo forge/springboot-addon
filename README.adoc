@@ -266,8 +266,8 @@ public class NewCrossOriginResourceSharingFilter
 
 Define the starters to be selected::
 
-If you want to use your own Spring Boot YAML config file containing the dependencies/starters to be selected for your project when it will be created with the command `project-new`,
-pass the reference of this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
+If you want to use a list of choosen dependencies/starters to be selected when you will create your project,
+pass the reference of this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE` to the command `project-new`
 +
 [source,java]
 ----
