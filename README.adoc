@@ -120,6 +120,7 @@ jpa-setup
 +
 The persistence provider will be configured with the appropriate driver and sane default settings.
 Also, by default, if no database is specified, H2 database "in-memory" is used.
++
 To configure by example mysql, pass these parameters:
 +
 ----
@@ -141,7 +142,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 
 Entities & fields::
 
-In order to create Entity classes representing the Java class to be mapped with the Database tables, use this command
+In order to create an `Entity` representing the Java class to be mapped with a Database table and its fields, use this command
 +
 ----
 jpa-new-entity --named Catalog
@@ -152,10 +153,29 @@ jpa-new-field --named price --type java.lang.Float
 jpa-new-field --named publication_date --type java.util.Date --temporalType DATE
 ----
 +
-Then a new JPA entity will be created, fields included we also generate an
-associated `CrudRepository` and a `RepositoryConfiguration` class.
+Then a new JPA entity will be created, fields included.
++
+The command also generate the `CrudRepository` used with the `spring-boot-starter-data-rest` starter
++
+[source,java]
+----
 
-Expose your entitites as REST endpoints::
+----
++
+and a `RepositoryConfiguration` class.
++
+[source,java]
+----
+@Configuration
+@EnableAutoConfiguration
+@EnableTransactionManagement
+@EntityScan(basePackages = "org.cdservice.model")
+@EnableJpaRepositories(basePackages = "org.cdservice.model")
+public class RepositoryConfiguration {
+}
+----
+
+Expose your entities as REST endpoints::
 
 The command `rest-generate-endpoints-from-entities` will generate JAX-RS RESTful endpoints based on JPA entities. The behavior
 is customized for Spring Boot and defaults to use the Apache CXF stack which supports the `JAX-RS` specification. The Spring Boot mode is activated by using
