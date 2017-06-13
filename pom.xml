@@ -126,7 +126,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot</artifactId>
-            <version>1.5.3.RELEASE</version>
+            <version>1.5.4.RELEASE</version>
         </dependency>
 
         <!-- we use dtos with jackson annotations -->
@@ -241,7 +241,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <environmentVariables>
-                                <SPRING_BOOT_DEFAULT_VERSION>1.5.1</SPRING_BOOT_DEFAULT_VERSION>
+                                <SPRING_BOOT_DEFAULT_VERSION>1.5.4</SPRING_BOOT_DEFAULT_VERSION>
                                 <SPRING_BOOT_VERSIONS>1.3.8,1.4.1,1.4.3</SPRING_BOOT_VERSIONS>
                             </environmentVariables>
                         </configuration>
