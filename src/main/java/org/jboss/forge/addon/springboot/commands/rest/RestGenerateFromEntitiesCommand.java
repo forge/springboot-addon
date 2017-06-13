@@ -7,7 +7,8 @@
  */
 package org.jboss.forge.addon.springboot.commands.rest;
 
-import org.jboss.forge.addon.javaee.rest.ui.RestEndpointFromEntityCommand;
+import java.util.Properties;
+
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
@@ -22,37 +23,41 @@ import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
 
-import java.util.Properties;
-
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
  */
-public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep {
-   private final RestEndpointFromEntityCommand original;
+public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep
+{
+   private final UICommand original;
    private final SpringBootHelper helper;
 
-   public RestGenerateFromEntitiesCommand(RestEndpointFromEntityCommand original, SpringBootHelper helper) {
+   public RestGenerateFromEntitiesCommand(UICommand original, SpringBootHelper helper)
+   {
       this.original = original;
       this.helper = helper;
    }
 
    @Override
-   public boolean isEnabled(UIContext context) {
+   public boolean isEnabled(UIContext context)
+   {
       return original.isEnabled(context);
    }
 
    @Override
-   public UICommandMetadata getMetadata(UIContext context) {
+   public UICommandMetadata getMetadata(UIContext context)
+   {
       return original.getMetadata(context);
    }
 
    @Override
-   public void initializeUI(UIBuilder builder) throws Exception {
+   public void initializeUI(UIBuilder builder) throws Exception
+   {
       original.initializeUI(builder);
    }
 
    @Override
-   public Result execute(UIExecutionContext context) throws Exception {
+   public Result execute(UIExecutionContext context) throws Exception
+   {
       final Result result = original.execute(context);
 
       final Project project = helper.getProject(context.getUIContext());
@@ -79,8 +84,8 @@ public class RestGenerateFromEntitiesCommand implements UICommand, UIWizardStep 
          sbApp.addImport("com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider");
 
          final MethodSource<JavaClassSource> method = sbApp.addMethod("public JacksonJsonProvider config() {\n" +
-               "\t\treturn new JacksonJsonProvider();\n" +
-               "\t}");
+                  "\t\treturn new JacksonJsonProvider();\n" +
+                  "\t}");
          method.addAnnotation("org.springframework.context.annotation.Bean");
 
          return sbApp;

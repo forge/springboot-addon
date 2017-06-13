@@ -7,19 +7,19 @@
  */
 package org.jboss.forge.addon.springboot.commands.jpa;
 
-import org.jboss.forge.addon.dependencies.Coordinate;
+import static org.jboss.forge.addon.javaee.jpa.DatabaseType.*;
+
 import org.jboss.forge.addon.javaee.jpa.DatabaseType;
 import org.jboss.forge.addon.javaee.jpa.JPADataSource;
-import org.jboss.forge.addon.javaee.jpa.containers.JavaEEDefaultContainer;
+import org.jboss.forge.addon.javaee.jpa.PersistenceContainer;
 import org.jboss.forge.furnace.util.Strings;
 import org.jboss.shrinkwrap.descriptor.api.persistence.PersistenceUnitCommon;
-
-import static org.jboss.forge.addon.javaee.jpa.DatabaseType.*;
 
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
  */
-public class SpringBootPersistenceContainer extends JavaEEDefaultContainer {
+public class SpringBootPersistenceContainer implements PersistenceContainer
+{
 
    @Override
    public String getName(boolean isGUI) {
@@ -34,21 +34,13 @@ public class SpringBootPersistenceContainer extends JavaEEDefaultContainer {
    }
 
    @Override
-   public String getDefaultDataSource() {
-      return null;
-   }
-
-   @Override
-   public DatabaseType getDefaultDatabaseType() {
-      return DatabaseType.H2;
-   }
-
-   @Override
    public PersistenceUnitCommon setupConnection(PersistenceUnitCommon unit, JPADataSource dataSource) {
-      final DatabaseType database = dataSource.getDatabase();
-      final Coordinate driverCoordinate = database.getDriverCoordinate();
+      unit.transactionType("JTA");
 
-      //todo
+      if (dataSource.getDatabase() == null)
+      {
+         dataSource.setDatabase(DatabaseType.H2);
+      }
 
       return unit;
    }

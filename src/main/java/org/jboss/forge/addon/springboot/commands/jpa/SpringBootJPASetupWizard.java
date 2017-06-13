@@ -7,15 +7,23 @@
  */
 package org.jboss.forge.addon.springboot.commands.jpa;
 
+import static org.jboss.forge.addon.javaee.jpa.DatabaseType.H2;
+import static org.jboss.forge.addon.springboot.commands.jpa.SpringBootPersistenceContainer.isNotEmbeddedDB;
+
+import java.util.Map;
+import java.util.stream.StreamSupport;
+
+import javax.inject.Inject;
+
 import org.jboss.forge.addon.dependencies.Coordinate;
 import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.javaee.jpa.*;
-import org.jboss.forge.addon.javaee.jpa.providers.HibernateProvider;
 import org.jboss.forge.addon.javaee.jpa.ui.setup.JPASetupWizard;
-import org.jboss.forge.addon.javaee.ui.AbstractJavaEECommand;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.stacks.annotations.StackConstraint;
+import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
 import org.jboss.forge.addon.springboot.SpringBootFacet;
 import org.jboss.forge.addon.springboot.utils.SpringBootHelper;
 import org.jboss.forge.addon.ui.context.*;
@@ -29,18 +37,16 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 import org.springframework.boot.jdbc.DatabaseDriver;
 
-import javax.inject.Inject;
-import java.util.Map;
-
-import static org.jboss.forge.addon.javaee.jpa.DatabaseType.H2;
-import static org.jboss.forge.addon.springboot.commands.jpa.SpringBootPersistenceContainer.isNotEmbeddedDB;
-
 /**
  * @author <a href="claprun@redhat.com">Christophe Laprun</a>
  */
 @FacetConstraint(JavaSourceFacet.class)
 @StackConstraint(JPAFacet.class)
-public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements JPASetupWizard {
+public class SpringBootJPASetupWizard extends AbstractProjectCommand implements JPASetupWizard
+{
+   @Inject
+   private ProjectFactory projectFactory;
+
    @Inject
    @WithAttributes(shortName = 't', label = "Database Type", required = true)
    private UISelectOne<DatabaseType> dbType;
@@ -58,20 +64,19 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
    private UISelectOne<PersistenceProvider> jpaProvider;
 
    @Inject
-   private HibernateProvider defaultProvider;
-
-   @Inject
    private SpringBootHelper helper;
 
    @Override
-   public Metadata getMetadata(UIContext context) {
+   public Metadata getMetadata(UIContext context)
+   {
       return Metadata.from(super.getMetadata(context), getClass()).name("JPA: Setup")
-            .description("Setup JPA in your project")
-            .category(Categories.create(super.getMetadata(context).getCategory().getName(), "JPA"));
+               .description("Setup JPA in your project")
+               .category(Categories.create(super.getMetadata(context).getCategory().getName(), "JPA"));
    }
 
    @Override
-   public void initializeUI(UIBuilder builder) throws Exception {
+   public void initializeUI(UIBuilder builder) throws Exception
+   {
       dbType.setDefaultValue(H2);
       builder.add(dbType).add(databaseURL).add(dataSourceName);
 
@@ -79,28 +84,40 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       builder.add(jpaProvider);
    }
 
-   private void initProviders() {
+   private void initProviders()
+   {
       jpaProvider.setItemLabelConverter(PersistenceProvider::getName);
-      jpaProvider.setDefaultValue(defaultProvider);
+
+      // select Hibernate provider as the default one
+      final PersistenceProvider hibernate = StreamSupport.stream(jpaProvider.getValueChoices().spliterator(), false)
+               .filter(provider -> provider.getName().toLowerCase().contains("hibernate"))
+               .findFirst()
+               .orElseThrow(() -> new IllegalStateException("Hibernate Persistence Provider is not available"));
+
+      jpaProvider.setDefaultValue(hibernate);
    }
 
    @Override
-   public void validate(UIValidationContext validator) {
+   public void validate(UIValidationContext validator)
+   {
       final DatabaseType database = dbType.getValue();
       final DatabaseDriver driver = DatabaseDriver.fromProductName(database.name());
-      if (driver.equals(DatabaseDriver.UNKNOWN)) {
+      if (driver.equals(DatabaseDriver.UNKNOWN))
+      {
          // Spring Boot doesn't know about this DB
          validator.addValidationError(dbType, "Spring Boot doesn't know about DB '" + dbType.getName() + "'");
       }
 
-      if (isNotEmbeddedDB(database) && !databaseURL.hasValue() && !dataSourceName.hasValue()) {
+      if (isNotEmbeddedDB(database) && !databaseURL.hasValue() && !dataSourceName.hasValue())
+      {
          validator.addValidationError(dataSourceName, "Either DataSource name or database URL is required");
          validator.addValidationError(databaseURL, "Either DataSource name or database URL is required");
       }
    }
 
    @Override
-   public Result execute(final UIExecutionContext context) throws Exception {
+   public Result execute(final UIExecutionContext context) throws Exception
+   {
       final UIContext uiContext = context.getUIContext();
       applyUIValues(uiContext);
 
@@ -109,32 +126,40 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
       final DatabaseType database = dbType.getValue();
       final Coordinate driverCoordinate = database.getDriverCoordinate();
       SpringBootHelper.addDependency(project, driverCoordinate.getGroupId(), driverCoordinate.getArtifactId())
-            .setScopeType("runtime");
+               .setScopeType("runtime");
       SpringBootHelper.addSpringBootDependency(project, SpringBootFacet.SPRING_BOOT_STARTER_DATA_JPA_ARTIFACT)
-            .setScopeType("runtime");
+               .setScopeType("runtime");
 
       return Results.success("Spring Boot JPA successfully set up!");
    }
 
    @Override
-   public NavigationResult next(UINavigationContext context) throws Exception {
+   public NavigationResult next(UINavigationContext context) throws Exception
+   {
       applyUIValues(context.getUIContext());
 
       final DatabaseType database = dbType.getValue();
-      if (!isNotEmbeddedDB(database)) {
+      if (!isNotEmbeddedDB(database))
+      {
          return Results.navigateTo(FinishJPASetupCommand.class);
-      } else {
-         if (dataSourceName.hasValue()) {
+      }
+      else
+      {
+         if (dataSourceName.hasValue())
+         {
             // if we specified a datasource, use it
             return Results.navigateTo(AddJNDIDatasourceCommand.class);
-         } else {
+         }
+         else
+         {
             // otherwise, we're using the DB URL, so deal with it
             return Results.navigateTo(AddDBURLCommand.class);
          }
       }
    }
 
-   private JPADataSource applyUIValues(final UIContext context) {
+   private JPADataSource applyUIValues(final UIContext context)
+   {
       Map<Object, Object> attributeMap = context.getAttributeMap();
 
       final Project project = helper.getProject(context);
@@ -158,7 +183,14 @@ public class SpringBootJPASetupWizard extends AbstractJavaEECommand implements J
    }
 
    @Override
-   protected boolean isProjectRequired() {
+   protected boolean isProjectRequired()
+   {
       return true;
+   }
+
+   @Override
+   protected ProjectFactory getProjectFactory()
+   {
+      return projectFactory;
    }
 }
