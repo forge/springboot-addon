@@ -6,24 +6,31 @@
  */
 package org.jboss.forge.addon.springboot.project;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jboss.forge.addon.parser.java.facets.JavaCompilerFacet;
 import org.jboss.forge.addon.parser.java.facets.JavaSourceFacet;
 import org.jboss.forge.addon.projects.AbstractProjectType;
 import org.jboss.forge.addon.projects.ProjectFacet;
-import org.jboss.forge.addon.projects.facets.DependencyFacet;
-import org.jboss.forge.addon.projects.facets.MetadataFacet;
-import org.jboss.forge.addon.projects.facets.PackagingFacet;
-import org.jboss.forge.addon.projects.facets.ResourcesFacet;
-import org.jboss.forge.addon.projects.facets.WebResourcesFacet;
+import org.jboss.forge.addon.projects.facets.*;
 import org.jboss.forge.addon.projects.stacks.Stack;
 import org.jboss.forge.addon.springboot.commands.setup.SetupProjectCommand;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SpringBootProjectType extends AbstractProjectType
 {
+   private static final List<Class<? extends ProjectFacet>> REQUIRED_FACETS = new ArrayList<>(7);
+
+   static {
+      REQUIRED_FACETS.add(MetadataFacet.class);
+      REQUIRED_FACETS.add(PackagingFacet.class);
+      REQUIRED_FACETS.add(DependencyFacet.class);
+      REQUIRED_FACETS.add(ResourcesFacet.class);
+      REQUIRED_FACETS.add(WebResourcesFacet.class);
+      REQUIRED_FACETS.add(JavaSourceFacet.class);
+      REQUIRED_FACETS.add(JavaCompilerFacet.class);
+   }
 
    @Override
    public boolean supports(Stack stack)
@@ -40,15 +47,7 @@ public class SpringBootProjectType extends AbstractProjectType
    @Override
    public Iterable<Class<? extends ProjectFacet>> getRequiredFacets()
    {
-      List<Class<? extends ProjectFacet>> result = new ArrayList<Class<? extends ProjectFacet>>(7);
-      result.add(MetadataFacet.class);
-      result.add(PackagingFacet.class);
-      result.add(DependencyFacet.class);
-      result.add(ResourcesFacet.class);
-      result.add(WebResourcesFacet.class);
-      result.add(JavaSourceFacet.class);
-      result.add(JavaCompilerFacet.class);
-      return result;
+      return REQUIRED_FACETS;
    }
 
    @Override

@@ -9,13 +9,10 @@ image:https://maven-badges.herokuapp.com/maven-central/org.jboss.forge.addon/spr
 
 This addon provides *standalone* functionality, and *exports services* for use in other addons.
 
-++++
-<iframe width="560" height="315" src="https://www.youtube.com/embed/ebcnOopZFWs" frameborder="0" allowfullscreen></iframe>
-++++
-
 === Prerequisites
 
-- JBoss Forge >= 3.5
+- JBoss Forge >= 3.7
+- Java 8
 
 === Installation
 
@@ -47,6 +44,10 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |no
 |no
 
+|parser-json
+|no
+|no
+
 |parser-yaml
 |no
 |no
@@ -54,79 +55,63 @@ addon-install-from-git --url https://github.com/forge/springboot-addon.git
 |cdi
 |no
 |no
+
+|scaffold
+|no
+|no
+
+|cdi
+|no
+|no
+
+|rest-client
+|no
+|no
+
+|templates
+|no
+|no
 |===
 
 == Features
-Setup a Spring Boot Project::
-First, create a Spring Boot project where the groupId or top level package is by example `org.demo`, the artifact which is also the name of the folder `example` and the version `1.0.0-SNAPSHOT`
-using the Forge shell
+The Spring Boot addon reuses standard commands adding options and/or new commands only when required.
+
+Supported commands::
+
+- `project-new` will create Spring Boot projects if you specify the `spring-boot` type options:
 +
 ----
-forge
-...
-To quit the shell, type 'exit'.
+project-new --named example --type spring-boot --spring-boot-version 1.5.3 --dependencies actuator web
+----
+You can specify which Spring Boot version to use using the `--spring-boot-version`, defaulting to `1.5.4.RELEASE`.
+You can add Spring Boot dependencies using the `--dependencies` option, specifying a space-separated list of
+dependencies. Note that pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
+ available dependencies that can then be auto-completed.
 
-[Temp]$ project-new --named example \
-                    --version 1.0.0-SNAPSHOT \
-                    --top-level-package org.demo \
-                    --type spring-boot
-----
-+
-And that's it!
+- `jpa-setup` will set things up to use JPA with an Hibernate persistence provider and configured with the
+appropriate driver and sane default settings. Also, by default, if no database is specified, H2 is used.
 
-Specify Version::
-To specify the Spring Boot version to be used, pass as parameter this attribute `--spring-boot-version`
-+
-[source,java]
-----
-project-new --named example \
-            --version 1.0.0-SNAPSHOT  \
-            --top-level-package org.demo  \
-            --type spring-boot  \
-            --spring-boot-version 1.4.1
-----
+- `jpa-new-entity` will create a new JPA entity using a Spring Boot flavor as, for each entity, we also generate an
+associated `CrudRepository` and a `RepositoryConfiguration` class.
 
-If you don't specify the version, than a list will be displayed where one of the item is the default value.
-
-Add Dependency::
-You can install Spring Boot dependencies by using the command spring-boot-setup-project` followed by the parameter `--dependencies`:
-+
-[source,java]
-----
-spring-boot-setup-project --dependencies
-Display all 113 possibilities? (y or n)
-activiti                       cassandra                      cluster-redis                  feign                          jms-hornetq                    neo4j                          sleuth-stream                  websocket
-actuator                       circuit-breaker-pcf            cluster-zookeeper              flyway                         jooq                           postgresql                     solr                           zipkin-client
-actuator-docs                  cloud-bootstrap                config-client                  freemarker                     jpa                            ratpack                        spring-cloud-kubernetes        zipkin-server
-amqp                           cloud-bus-amqp                 config-client-pcf              gemfire                        ldap                           reactive-web                   sql-server                     zipkin-stream
-aop                            cloud-bus-kafka                config-server                  groovy-templates               linkedin                       redis                          stream-kafka                   zipkin-ui
-apache-camel                   cloud-connectors               configuration-processor        h2                             liquibase                      remote-shell                   stream-rabbit                  zookeeper-configuration
-apache-camel-zipkin            cloud-contract-stub-runner     consul-configuration           hateoas                        local-data-flow-server         rest-docs                      thymeleaf                      zookeeper-discovery
-apache-derby                   cloud-contract-verifier        consul-discovery               hsqldb                         lombok                         rest-repositories              turbine                        zuul
-atomikos-jta                   cloud-contract-wiremock        couchbase                      hystrix                        mail                           rest-repositories-hal-browser  turbine-stream
-aws-core                       cloud-foundry-discovery        data-flow-shell                hystrix-dashboard              mobile                         retry                          twitter
-aws-jdbc                       cloud-oauth2                   devtools                       integration                    mongodb                        ribbon                         vaadin
-aws-messaging                  cloud-security                 elasticsearch                  jdbc                           mustache                       security                       validation
-batch                          cloud-task                     eureka-discovery               jersey-jax-rs                  mybatis                        service-registry-pcf           velocity
-bitronix-jta                   cluster-etcd                   eureka-server                  jms-activemq                   mysql                          session                        web
-cache                          cluster-hazelcast              facebook                       jms-artemis                    narayana-jta                   sleuth                         web-services
-----
-+
-You can choose any dependency you want to install.
-
-If you know which dependencies you need, you can pass them as a list of items separated by a space. Here is an example where you will pass the dependency
-about `web` and `actuator`
-----
-spring-boot-setup-project --spring-boot-version 1.4.3 --dependencies actuator web
-----
-
-One line::
-You can also create your project using one command line with the required parameters:
+- `rest-generate-endpoints-from-entities` will generate JAX-RS RESTful endpoints based on JPA entities. The behavior
+is customized for Spring Boot and defaults to use the Apache CXF stack. The Spring Boot mode is activated by using
+a custom `SPRING_BOOT_JPA_ENTITY` generator:
 +
 ----
-project-new --named demo --version 1.0 --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.3 --dependencies actuator elasticsearch
+rest-generate-endpoints-from-entities --generator SPRING_BOOT_JPA_ENTITY --targets ...
 ----
+Note that the resources derived from the JPA entities are currently limited to JSON representations (with the Jackson
+ JSON stack).
 
+- `rest-new-endpoint`: to document, not well tested
+
+- `rest-new-cross-origin-resource-sharing-filter` will create a CORS filter so that cross-origin requests are allowed
+. The filter is also annotated so that it is automatically recognized by the Apache CXF implementation.
+
+
+
+TODO: Check this part
 Use your Config File::
 If you want to use a YAML config file containing the dependencies to be used for your project, you can create such a file according to the convention defined by
 http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#configuration-format[Spring Initialzr] and pass the reference to this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
@@ -140,21 +125,3 @@ spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
 +
 An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]. Only the dependencies section will be used to
 populate the pom.xml.
-
-Add a REST controller::
-The project generated by `start.spring.io` is pretty lean as it only includes an Application class and an application.properties file.
-By using the following command you will be able to generate a REST controller class exposing a `/greeting` endpoint and generating a response using the `Greeting` model class.
-+
-To create the controller, issue this command where the name passed will be used to create the Java class under the package name of the project
-+
-[source,java]
-----
-spring-rest-new-endpoint --named GreetingController
-----
-+
-To define the path to access the REST endpoints, extend the command with the `--path` parameter
-+
-[source,java]
-----
-spring-rest-new-endpoint --named GreetingController --path api
-----
