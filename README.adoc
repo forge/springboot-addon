@@ -181,14 +181,15 @@ public class RepositoryConfiguration {
 Expose your entities as REST endpoints::
 
 The command `rest-generate-endpoints-from-entities` will generate JAX-RS RESTful endpoints based on JPA entities. The behavior
-is customized for Spring Boot and defaults to use the Apache CXF stack which supports the `JAX-RS` specification. The Spring Boot mode is activated by using
-a custom `SPRING_BOOT_JPA_ENTITY` generator:
+is customized for Spring Boot and defaults to use the Apache CXF stack which supports the `JAX-RS` specification and is packaged within the `cxf-spring-boot-starter-jaxrs` starter.
++
+The Spring Boot mode is activated by using the `SPRING_BOOT_JPA_ENTITY` generator:
 +
 ----
 rest-generate-endpoints-from-entities --generator SPRING_BOOT_JPA_ENTITY --targets ...
 ----
-Note that the resources derived from the JPA entities are currently limited to JSON representations (with the Jackson
- JSON stack).
++
+WARNING: Note that the resources derived from the JPA entities are currently limited to JSON representations (with the Jackson JSON stack).
 
 Generate a REST endpoint::
 
