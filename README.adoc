@@ -236,10 +236,37 @@ Support CORS::
 The `rest-new-cross-origin-resource-sharing-filter` command will create a CORS filter so that cross-origin requests are allowed.
 The filter is also annotated so that it is automatically recognized by the Apache CXF implementation when it will start to scan the classes to check if some contain
 the annotation `@Component`.
++
+Example:
++
+[source,java]
+----
+@Provider
+@Component
+public class NewCrossOriginResourceSharingFilter
+		implements
+			ContainerResponseFilter {
 
-Define the starters to be used::
+	@Override
+	public void filter(ContainerRequestContext request,
+			ContainerResponseContext response) {
+		response.getHeaders().putSingle("Access-Control-Allow-Origin", "*");
+		response.getHeaders().putSingle("Access-Control-Expose-Headers",
+				"Location");
+		response.getHeaders().putSingle("Access-Control-Allow-Methods",
+				"GET, POST, PUT, DELETE");
+		response.getHeaders()
+				.putSingle("Access-Control-Allow-Headers",
+						"Content-Type, User-Agent, X-Requested-With, X-Requested-By, Cache-Control");
+		response.getHeaders().putSingle("Access-Control-Allow-Credentials",
+				"true");
+	}
+}
+----
 
-If you want to use a Spring Boot YAML config file containing the dependencies/starters to be used for your project when it will be created with the command `project-new`,
+Define the starters to be selected::
+
+If you want to use your own Spring Boot YAML config file containing the dependencies/starters to be selected for your project when it will be created with the command `project-new`,
 pass the reference of this file using the following ENV variable `SPRING_BOOT_CONFIG_FILE`
 +
 [source,java]
@@ -252,4 +279,4 @@ spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
 An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]. Only the dependencies section will be used to
 populate the pom.xml.
 
-NOTE: you can create such a file according to the convention defined by http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#configuration-format[Spring Initialzr]
+NOTE: You can create such a file according to the convention defined by http://docs.spring.io/initializr/docs/current/reference/htmlsingle/#configuration-format[Spring Initialzr]
