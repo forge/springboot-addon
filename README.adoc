@@ -78,9 +78,10 @@ The Spring Boot addon reuses standard commands adding options and/or new command
 
 Spring Boot Project type::
 
-If you are creating a new project, you can use the `spring-boot` type directly with the `project-new` command and a Spring Boot project will be created
-by issuying a REST call against the server `start.spring.io` in order to get the zipped created file. The content of this file will be unzipped
-locally according to the `--named` parameter specify
+If you want to create a new Spring Boot starter project as you can do using the site `start.spring.io`, simply use the `project-new` command where you specify `spring-boot` as project type.
+The command will issue a REST call against `start.spring.io`, will get a zip file containing the maven project created according to the parameters passed. The content of this file will be unzipped
+locally according under the directory as defined by the `--named` parameter. When no Spring Boot starters / dependencies is defined, then `start.spring.io` will return a project containing
+the `spring-boot-starter` and `spring-boot-starter-test` maven artifacts using the default Spring version which is `1.5.3.RELEASE`
 +
 ----
 project-new --named example --type spring-boot
@@ -88,14 +89,15 @@ project-new --named example --type spring-boot
 
 Starter Version and dependencies::
 
-You can specify which Spring Boot starter version to use using the `--spring-boot-version`, defaulting to `1.5.4.RELEASE`.
-You can add Spring Boot dependencies using the `--dependencies` option, specifying a space-separated list of
-dependencies. Note that pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
-available dependencies that can then be auto-completed.
+You can specify which Spring Boot starter version you want to use using the `--spring-boot-version` parameter like also the starters with
+the `--dependencies` option, with is a defined as a space-separated list of dependencies.
 +
 ----
 project-new --named example --type spring-boot --spring-boot-version 1.5.3 --dependencies actuator web
 ----
++
+Note that pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
+available dependencies that can then be auto-completed.
 
 One line::
 
