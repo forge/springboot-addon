@@ -112,7 +112,7 @@ Whenever it is required to setup the Hibernate provider using the `spring-boot-s
 ----
 jpa-setup
 ----
-
++
 The persistence provider will be configured with the appropriate driver and sane default settings.
 Also, by default, if no database is specified, H2 is used.
 To configure by example mysql, pass these parameters
@@ -146,7 +146,7 @@ jpa-new-field --named description --length 2000
 jpa-new-field --named price --type java.lang.Float
 jpa-new-field --named publication_date --type java.util.Date --temporalType DATE
 ----
-
++
 Then a new JPA entity will be created, fields included we also generate an
 associated `CrudRepository` and a `RepositoryConfiguration` class.
 
