@@ -79,8 +79,11 @@ The Spring Boot addon reuses standard commands adding options and/or new command
 Spring Boot Project type::
 
 If you want to create a new Spring Boot starter project as you can do using the site `start.spring.io`, simply use the `project-new` command where you specify `spring-boot` as project type.
-The command will issue a REST call against `start.spring.io`, will get a zip file containing the maven project created according to the parameters passed. The content of this file will be unzipped
-locally according under the directory as defined by the `--named` parameter. When no Spring Boot starters / dependencies is defined, then `start.spring.io` will return a project containing
+The command will issue a REST call against `start.spring.io`, will get a zip file containing the maven project created according to the parameters passed.
++
+The content of this file will be unzipped locally according under the directory as defined by the `--named` parameter.
++
+When no Spring Boot starters / dependencies is defined, then `start.spring.io` will return a project containing
 the `spring-boot-starter` and `spring-boot-starter-test` maven artifacts using the default Spring version which is `1.5.3.RELEASE`
 +
 ----
