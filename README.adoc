@@ -96,10 +96,10 @@ You can specify which Spring Boot starter version you want to use when the proje
 with the `--dependencies` option, which is defined as a space-separated list of dependencies.
 +
 ----
-project-new --named example --type spring-boot --spring-boot-version 1.5.3 --dependencies actuator web
+project-new --named example --type spring-boot  --spring-boot-version 1.4.3 --dependencies actuator web
 ----
 +
-Note that pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
+NOTE: By pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
 available dependencies that can then be auto-completed.
 
 One line::
