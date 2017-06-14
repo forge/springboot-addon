@@ -63,7 +63,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    private static String SPRING_BOOT_CONFIG_FILE;
    private static String SPRING_BOOT_DEFAULT_VERSION;
    private static List<String> SPRING_BOOT_VERSIONS;
-   private static final List<String> DEFAULT_SPRING_BOOT_VERSIONS = new ArrayList<>(3);
+   private static final List<String> DEFAULT_SPRING_BOOT_VERSIONS = new ArrayList<>(5);
 
    static {
       Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.4.1", "1.4.3", "1.4.7", "1.5.3", "1.5.4");
