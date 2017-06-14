@@ -6,6 +6,12 @@
  */
 package org.jboss.forge.addon.springboot;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.jboss.arquillian.junit.Arquillian;
@@ -25,12 +31,6 @@ import org.jboss.forge.parser.xml.Node;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:cmoullia@redhat.com">Charles Moulliard</a>
@@ -78,7 +78,11 @@ public class SetupCommandTest {
 		SpringBootDependencyDTO actuatorDTO = new SpringBootDependencyDTO("Ops","actuator","Actuator","Production ready features to help you monitor and manage your application");
 		Iterable<SpringBootDependencyDTO> deps = Arrays.asList(securityDTO, actuatorDTO);
 		controller.setValueFor("dependencies", deps);
-		controller.setValueFor("springBootVersion","1.3.8");
+      final String askedVersion = "2.0.0.M1";
+
+      controller.setValueFor("springBootVersion", askedVersion);
+      assertEquals(askedVersion, controller.getValueFor("springBootVersion"));
+
 		Result result = controller.execute();
 		MavenFacet mavenFacet = project.getFacet(MavenFacet.class);
 		MavenModelResource modelResource = mavenFacet.getModelResource();
@@ -91,7 +95,7 @@ public class SetupCommandTest {
 		Parent parent = model.getParent();
 		assertEquals("org.springframework.boot",parent.getGroupId());
 		assertEquals("spring-boot-starter-parent",parent.getArtifactId());
-		assertEquals("1.3.8.RELEASE",parent.getVersion());
+      assertEquals(askedVersion, parent.getVersion());
 
 		Node contents = modelResource.getXmlSource();
 		List<Node> dependenciesNodes = contents.get("dependencies").get(0).getChildren();
@@ -122,7 +126,7 @@ public class SetupCommandTest {
 		}
 		else {
 			controller.getValueFor("springBootVersion");
-			assertEquals("1.5.3", controller.getValueFor("springBootVersion"));
+         assertEquals("1.5.4.RELEASE", controller.getValueFor("springBootVersion"));
 		}
 	}
 

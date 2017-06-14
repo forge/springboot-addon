@@ -6,6 +6,23 @@
  */
 package org.jboss.forge.addon.springboot.commands.setup;
 
+import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDelete;
+import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
+import static org.jboss.forge.addon.springboot.utils.ConvertHelper.removeDoubleQuotes;
+import static org.jboss.forge.addon.springboot.utils.IOHelper.close;
+import static org.jboss.forge.addon.springboot.utils.IOHelper.copyAndCloseInput;
+import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.ws.rs.client.Client;
+
 import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
@@ -36,22 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.inject.Inject;
-import javax.ws.rs.client.Client;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.jboss.forge.addon.maven.archetype.ArchetypeHelper.recursiveDelete;
-import static org.jboss.forge.addon.springboot.utils.ConvertHelper.jsonToMap;
-import static org.jboss.forge.addon.springboot.utils.ConvertHelper.removeDoubleQuotes;
-import static org.jboss.forge.addon.springboot.utils.IOHelper.close;
-import static org.jboss.forge.addon.springboot.utils.IOHelper.copyAndCloseInput;
-import static org.jboss.forge.addon.springboot.utils.UnzipHelper.unzip;
-
 public class SetupProjectCommand extends AbstractSpringBootCommand implements UIWizardStep
 {
 
@@ -64,9 +65,11 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    private static String SPRING_BOOT_DEFAULT_VERSION;
    private static List<String> SPRING_BOOT_VERSIONS;
    private static final List<String> DEFAULT_SPRING_BOOT_VERSIONS = new ArrayList<>(5);
+   private static final String DEFAULT_SPRING_BOOT_VERSION = "1.5.4.RELEASE";
 
    static {
-      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.4.1", "1.4.3", "1.4.7", "1.5.3", "1.5.4");
+      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.4.1.RELEASE", "1.4.3.RELEASE", "1.4.7.RELEASE",
+               "1.5.3.RELEASE", DEFAULT_SPRING_BOOT_VERSION, "2.0.0.M1");
    }
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
@@ -77,7 +80,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    {
       if (SPRING_BOOT_DEFAULT_VERSION == null) {
          final String bootDefaultVersion = System.getenv("SPRING_BOOT_DEFAULT_VERSION");
-         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : "1.5.4";
+         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : DEFAULT_SPRING_BOOT_VERSION;
       }
       if (SPRING_BOOT_VERSIONS == null || SPRING_BOOT_VERSIONS.isEmpty()) {
          final String bootVersions = System.getenv("SPRING_BOOT_VERSIONS");
@@ -239,7 +242,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
       String springBootDeps = csbSpringBoot.toString();
 
       // boot version need the RELEASE suffix
-      String bootVersion = springBootVersion.getValue() + ".RELEASE";
+      String bootVersion = springBootVersion.getValue();
 
       String url = String
                .format("%s?bootVersion=%s&groupId=%s&artifactId=%s&version=%s&packageName=%s&dependencies=%s",
