@@ -96,7 +96,7 @@ You can specify which Spring Boot starter version you want to use when the proje
 with the `--dependencies` option, which is defined as a space-separated list of dependencies.
 +
 ----
-project-new --named example --type spring-boot  --spring-boot-version 1.4.3 --dependencies actuator web
+project-new --named example --type spring-boot  --spring-boot-version 1.4.3.RELEASE --dependencies actuator web
 ----
 +
 NOTE: By pressing tab after typing `--dependencies` option will result in Forge retrieving the list of
@@ -107,7 +107,7 @@ One line::
 You can create your project using one `command line` with the required parameters:
 +
 ----
-project-new --named demo --version 1.0 --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.3 --dependencies actuator elasticsearch
+project-new --named demo --version 1.0 --top-level-package org.demo --type spring-boot --spring-boot-version 1.4.3.RELEASE --dependencies actuator elasticsearch
 ----
 
 Persistence setup::
@@ -273,7 +273,7 @@ pass the reference of this file using the following ENV variable `SPRING_BOOT_CO
 ----
 export SPRING_BOOT_CONFIG_FILE=file:///path/to/your/spring-boot-application.yaml
 
-spring-boot-new-project --spring-boot-version 1.4.3 --dependencies ...
+spring-boot-new-project --spring-boot-version 1.4.3.RELEASE --dependencies ...
 ----
 +
 An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]. Only the dependencies section will be used to
