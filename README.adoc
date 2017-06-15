@@ -165,8 +165,11 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface AlbumRepository extends PagingAndSortingRepository<Album, Long> {
 }
 ----
+For more details on how to access JPA entities RESTfully with Spring Boot, please take a look at
+https://spring.io/guides/gs/accessing-data-rest/[https://spring.io/guides/gs/accessing-data-rest/].
+`PagingAndSortingRepository` is described in the "Create a Person repository" section of that document.
 
-Expose your entities as REST endpoints::
+Expose your entities as REST endpoints using JAX-RS::
 
 The command `rest-generate-endpoints-from-entities` will generate JAX-RS RESTful endpoints based on JPA entities. The behavior
 is customized for Spring Boot and defaults to use the Apache CXF stack which supports the `JAX-RS` specification and is packaged within the `cxf-spring-boot-starter-jaxrs` starter.
