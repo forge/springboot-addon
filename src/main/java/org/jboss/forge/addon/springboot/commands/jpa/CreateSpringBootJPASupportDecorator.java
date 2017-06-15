@@ -48,12 +48,13 @@ public class CreateSpringBootJPASupportDecorator implements JavaSourceDecorator<
             .orElseThrow(IllegalArgumentException::new)
             .getType()
             .getSimpleName();
-      final String repoInterfaceDeclaration = "public interface " + name + "Repository extends CrudRepository<"
+      final String repoInterfaceDeclaration = "public interface " + name
+               + "Repository extends PagingAndSortingRepository<"
             + name + "," + idFieldType + "> {}";
 
       JavaInterfaceSource repoSource = Roaster.parse(JavaInterfaceSource.class, repoInterfaceDeclaration)
             .setPackage(entitySource.getPackage());
-      repoSource.addImport("org.springframework.data.repository.CrudRepository");
+      repoSource.addImport("org.springframework.data.repository.PagingAndSortingRepository");
       Roaster.format(repoSource.toString());
 
       // Create Java Classes Greeting and GreetingProperties

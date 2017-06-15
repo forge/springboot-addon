@@ -145,7 +145,7 @@ Entities & fields::
 In order to create an `Entity` representing the Java class to be mapped with a Database table and its fields, use this command
 +
 ----
-jpa-new-entity --named Catalog
+jpa-new-entity --named Album
 jpa-new-field --named artist
 jpa-new-field --named title
 jpa-new-field --named description --length 2000
@@ -155,13 +155,14 @@ jpa-new-field --named publication_date --type java.util.Date --temporalType DATE
 +
 Then a new JPA entity will be created, fields included.
 +
-The command also generate the `CrudRepository` used with the `spring-boot-starter-data-rest` starter
+The command also generates a `PagingAndSortingRepository` implementation that can be used with the
+`spring-boot-starter-data-rest` starter to automatically expose a REST endpoint for this entity:
 +
 [source,java]
 ----
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface CatalogRepository extends CrudRepository<Catalog, Long> {
+public interface AlbumRepository extends PagingAndSortingRepository<Album, Long> {
 }
 ----
 
