@@ -164,19 +164,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface CatalogRepository extends CrudRepository<Catalog, Long> {
 }
 ----
-+
-and a `RepositoryConfiguration` class.
-+
-[source,java]
-----
-@Configuration
-@EnableAutoConfiguration
-@EnableTransactionManagement
-@EntityScan(basePackages = "org.cdservice.model")
-@EnableJpaRepositories(basePackages = "org.cdservice.model")
-public class RepositoryConfiguration {
-}
-----
 
 Expose your entities as REST endpoints::
 
