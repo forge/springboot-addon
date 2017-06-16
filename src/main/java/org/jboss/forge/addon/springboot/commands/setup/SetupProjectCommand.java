@@ -69,7 +69,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
    static {
       Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.4.1.RELEASE", "1.4.3.RELEASE", "1.4.7.RELEASE",
-               "1.5.3.RELEASE", DEFAULT_SPRING_BOOT_VERSION, "2.0.0.M1");
+               "1.5.3.RELEASE", DEFAULT_SPRING_BOOT_VERSION, "2.0.0.M1", "2.0.0.M2");
    }
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
