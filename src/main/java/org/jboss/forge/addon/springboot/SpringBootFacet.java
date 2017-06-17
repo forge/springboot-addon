@@ -70,6 +70,6 @@ public class SpringBootFacet extends AbstractProjectFacet {
    @Override
    public boolean isInstalled() {
       final DependencyFacet facet = getFaceted().getFacet(DependencyFacet.class);
-      return facet.hasDirectDependency(SPRING_BOOT_STARTER);
+      return facet.hasEffectiveDependency(SPRING_BOOT_STARTER) || facet.hasDirectDependency(SPRING_BOOT_STARTER);
    }
 }
