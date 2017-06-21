@@ -29,7 +29,7 @@
     <name>JBoss :: Forge Addon :: SpringBoot</name>
 
     <properties>
-        <forge.version>3.7.0.Final</forge.version>
+        <forge.version>3.7.1.Final</forge.version>
         <squareup.version>3.4.1</squareup.version>
         <jackson.version>2.8.6</jackson.version>
 
