@@ -65,22 +65,26 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
    private static String SPRING_BOOT_DEFAULT_VERSION;
    private static List<String> SPRING_BOOT_VERSIONS;
    private static final List<String> DEFAULT_SPRING_BOOT_VERSIONS = new ArrayList<>(5);
-   private static final String DEFAULT_SPRING_BOOT_VERSION = "1.5.4.RELEASE";
+   private static final String LATEST_STABLE_SPRING_BOOT_VERSION = "1.5.4.RELEASE";
+   private static final String RHOAR_SUPPORTED_VERSION = "1.4.1.RELEASE";
+   private static final String LATEST_1_4_SPRING_BOOT_VERSION = "1.4.7.RELEASE";
+   private static final String LATEST_2_0_VERSION = "2.0.0.M2";
 
    static {
-      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, "1.4.1.RELEASE", "1.4.3.RELEASE", "1.4.7.RELEASE",
-               "1.5.3.RELEASE", DEFAULT_SPRING_BOOT_VERSION, "2.0.0.M1", "2.0.0.M2");
+      Collections.addAll(DEFAULT_SPRING_BOOT_VERSIONS, RHOAR_SUPPORTED_VERSION, LATEST_1_4_SPRING_BOOT_VERSION,
+               LATEST_STABLE_SPRING_BOOT_VERSION, LATEST_2_0_VERSION);
    }
 
    private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
    private static final String STARTER_URL = "https://start.spring.io";
-   private static List<Map> deps = new ArrayList<Map>();
+   private static List deps = new ArrayList<>();
 
    public SetupProjectCommand()
    {
       if (SPRING_BOOT_DEFAULT_VERSION == null) {
          final String bootDefaultVersion = System.getenv("SPRING_BOOT_DEFAULT_VERSION");
-         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion : DEFAULT_SPRING_BOOT_VERSION;
+         SPRING_BOOT_DEFAULT_VERSION = bootDefaultVersion != null ? bootDefaultVersion
+                  : LATEST_STABLE_SPRING_BOOT_VERSION;
       }
       if (SPRING_BOOT_VERSIONS == null || SPRING_BOOT_VERSIONS.isEmpty()) {
          final String bootVersions = System.getenv("SPRING_BOOT_VERSIONS");
@@ -345,7 +349,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
             InputStream input = new URL(SPRING_BOOT_CONFIG_FILE).openStream();
             Map<String, Map> data = (Map) yaml.load(input);
             Map<String,List<Map>> initializer = (Map) data.get("initializr");
-            deps = (List) initializer.get("dependencies");
+            deps = initializer.get("dependencies");
          }
          else
          {
@@ -359,7 +363,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
             client.close();
             Map<String,Object> data = jsonToMap(response);
             Map<String,List<Map>> dependencies = (Map) data.get("dependencies");
-            deps = (List) dependencies.get("values");
+            deps = dependencies.get("values");
          }
          return deps;
       }
