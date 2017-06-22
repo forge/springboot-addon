@@ -265,7 +265,7 @@ pass the reference of this file using the following ENV variable `SPRING_BOOT_CO
 ----
 export SPRING_BOOT_CONFIG_FILE=file:///path/to/your/spring-boot-application.yaml
 
-spring-boot-new-project --spring-boot-version 1.4.3.RELEASE --dependencies ...
+project-new --type spring-boot --spring-boot-version 1.4.3.RELEASE --dependencies ...
 ----
 +
 An example of such a file is link:src/main/resources/spring-boot-application.yaml[available]. Only the dependencies section will be used to
