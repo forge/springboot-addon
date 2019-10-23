@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 
+import org.jboss.forge.addon.configuration.Configuration;
 import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.MetadataFacet;
@@ -75,7 +76,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
                LATEST_STABLE_SPRING_BOOT_VERSION, LATEST_2_0_VERSION);
    }
 
-   private static final String STARTER_ZIP_URL = "https://start.spring.io/starter.zip";
+   private static final String STARTER_ZIP_URL = "/starter.zip";
    private static final String STARTER_URL = "https://start.spring.io";
    private static List deps = new ArrayList<>();
 
@@ -119,6 +120,9 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
    @Inject
    private FacetFactory facetFactory;
+
+   @Inject
+   private Configuration configuration;
 
    private List<SpringBootDependencyDTO> choices;
 
@@ -250,7 +254,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
 
       String url = String
                .format("%s?bootVersion=%s&groupId=%s&artifactId=%s&version=%s&packageName=%s&dependencies=%s",
-                        STARTER_ZIP_URL, bootVersion, projectGroupId, projectName, projectVersion, projectGroupId,
+                        getStarterURL() + STARTER_ZIP_URL, bootVersion, projectGroupId, projectName, projectVersion, projectGroupId,
                         springBootDeps);
 
       LOG.info("About to query url: " + url);
@@ -336,6 +340,11 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
                "Created new Spring Boot project in directory: " + folder.getName());
    }
 
+   private String getStarterURL()
+   {
+        return configuration.getString("springboot.starterurl", STARTER_URL);
+   }
+
    private List fetchDependencies(UIOutput uiOutput) throws Exception
    {
       if(deps.size() > 0) {
@@ -356,7 +365,7 @@ public class SetupProjectCommand extends AbstractSpringBootCommand implements UI
             // Fetch the dependencies list from the start.spring.io server
             uiOutput.info(uiOutput.out(),"Fetch deps from start.spring.io");
             Client client = factory.createClient();
-            String response = client.target(STARTER_URL)
+            String response = client.target(getStarterURL())
                      .request()
                      .header("User-Agent",USER_AGENT)
                      .get(String.class);
