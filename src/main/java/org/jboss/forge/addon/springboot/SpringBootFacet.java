@@ -17,6 +17,23 @@ import org.jboss.forge.addon.projects.facets.DependencyFacet;
  *
  * @author <a href="claprun@redhat.com>Christophe Laprun</a>
  */
+/**
+ * Filename: SpringBootFacet.java <br>
+ *
+ * Description: 启动类<br>
+ *
+ * @author: r <br>
+ * @version: 1.0 <br>
+ * @Createtime: 2019/12/13 <br>
+ *
+ * Modification History:
+ * Date         Author          Version            Description
+ *---------------------------------------------------------*
+ * 2019/12/13      r            v1.0              修改添加注释
+ *
+ * @Copyright: Copyright (c)2019 by r <br>
+ *
+ */
 public class SpringBootFacet extends AbstractProjectFacet {
    public static final String SPRING_BOOT_GROUP_ID = "org.springframework.boot";
 
