@@ -31,7 +31,7 @@
     <properties>
         <forge.version>3.7.1.Final</forge.version>
         <squareup.version>3.4.1</squareup.version>
-        <jackson.version>2.10.0</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
